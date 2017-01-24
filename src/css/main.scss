@@ -10,15 +10,15 @@
 @font-face {
   font-family: 'Calibre';
   src: url("https://s3.amazonaws.com/rangle.io.static-assets/WebFonts/CalibreWeb-Regular.eot");
-  src: url("https://s3.amazonaws.com/rangle.io.static-assets/WebFonts/CalibreWeb-Regular.eot?#iefix") format("embedded-opentype"), 
-  url("https://s3.amazonaws.com/rangle.io.static-assets/WebFonts/CalibreWeb-Regular.woff2") format("woff2"), 
+  src: url("https://s3.amazonaws.com/rangle.io.static-assets/WebFonts/CalibreWeb-Regular.eot?#iefix") format("embedded-opentype"),
+  url("https://s3.amazonaws.com/rangle.io.static-assets/WebFonts/CalibreWeb-Regular.woff2") format("woff2"),
   url("https://s3.amazonaws.com/rangle.io.static-assets/WebFonts/CalibreWeb-Regular.woff") format("woff")
 }
 @font-face {
   font-family: 'Calibre';
   src: url("https://s3.amazonaws.com/rangle.io.static-assets/WebFonts/CalibreWeb-Light.eot");
-  src: url("https://s3.amazonaws.com/rangle.io.static-assets/WebFonts/CalibreWeb-Light.eot?#iefix") format("embedded-opentype"), 
-  url("https://s3.amazonaws.com/rangle.io.static-assets/WebFonts/CalibreWeb-Light.woff2") format("woff2"), 
+  src: url("https://s3.amazonaws.com/rangle.io.static-assets/WebFonts/CalibreWeb-Light.eot?#iefix") format("embedded-opentype"),
+  url("https://s3.amazonaws.com/rangle.io.static-assets/WebFonts/CalibreWeb-Light.woff2") format("woff2"),
   url("https://s3.amazonaws.com/rangle.io.static-assets/WebFonts/CalibreWeb-Light.woff") format("woff")
 }
 
@@ -44,7 +44,7 @@ $headingFont: 'Calibre', sans-serif;
 $headingColor: #fff;
 $headingLineHeight: 1.2;
 $headingLetterSpacing: normal;
-$headingTextTransform: uppercase;
+$headingTextTransform: none;
 $headingTextShadow: none;
 $headingFontWeight: normal;
 $heading1TextShadow: $headingTextShadow;
@@ -71,7 +71,7 @@ $selectionColor: #fff;
 // Theme template ------------------------------
 @import '~reveal.js/css/theme/template/theme.scss';
 // ---------------------------------------------
- 
+
 // Overrides -----------------------------------
 .reveal .slides > section, .reveal .slides > section > section {
   padding: 10px 0;
