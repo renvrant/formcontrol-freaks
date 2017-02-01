@@ -9,18 +9,19 @@
 ## Cats
 
 - Here are pictures of our cats so you'll like us.
+- Awwwww.
 
 ---
 
-Complex forms are a business requirement.
+Enterprises love forms.
 
 ---
 
 ## The problem
 
 - Many large forms means verbose, boilerplate code
-- API changes are harder to deal with
-- Bootstrapping form with existing data on the server
+- Maintenance, API changes are hard to deal with
+- Template driven forms are just nicer.
 
 ---
 
@@ -31,13 +32,25 @@ Complex forms are a business requirement.
 
 ---
 
-Redux can do for form data what it's done for state.
+Redux can simplify forms too.
 
 ---
 
 ## Forms with Redux
 - Centralizes form data
-- Template driven forms with FormBuilder validation
-- Plays nice with your redux app
-- Test and re-use the form reducer
+- Use template-driven forms with validation
+- UX enhancements from Redux
 - Pure JS functions for business rules
+
+---
+
+## In this Talk
+- Adding Redux to your application
+- Creating a form reducer and basic actions
+- Creating a form subscription
+- Binding your form to state
+- Adding array values
+- Validating through reselect
+- Showing validation errors
+- Asynchronous validation
+- Optimization considerations
