@@ -1,102 +1,112 @@
-## Add Redux and Configure Your Store
-
-- Your form will be an object on the store
-- Your form reducer will need an action to save the form and update the state
-- Your interfaces will represent what you want your form to look like on the store
+## Project Dependencies
+- Redux
+- NgRedux
+- Reselect
+- Ramda
 
 ---
 
-## Create the Store
-
-First you need to add Redux to your application, expecting a `formReducer`
+## Create form in the store
+Your form will be an object on the store, shaped however you like
 
 ```ts
-import {
-  createStore,
-  combineReducers,
-} from 'redux';
-import { formReducer } from './form';
+export interface ICharacter {
+  name?: string;
+  bioSummary: IBioSummary;
+  skills: TSkills;
+}
 
-export interface IAppState {
-  form?: IForm;
-};
+export interface IBioSummary {
+  age: number;
+  size: string;
+  alignment: string;
+  race: string;
+}
 
-const rootReducer = combineReducers<IAppState>({
-  form: formReducer,
-});
-
-export const store = createStore(rootReducer, {});
+export interface IForm {
+  character: ICharacter;
+}
 ```
 
 ---
 
-## Starter Form Reducer
-
-- A reducer with a `SAVE_FORM` action
-- Expects an object representing the form and merges the whole thing with the current state
-- Optimizations to come later
+## Setting up actions
+Action payloads include the path to the form in the store 
 
 ```ts
-import {
-  ICharacter,
-  IForm
-} from './types';
-import {IPayloadAction} from '../../actions/index';
-import * as R from 'ramda';
+export const saveForm = (path, value) => ({
+  type: 'SAVE_FORM',
+  payload: {
+    path,
+    value
+  }
+});
+```
 
-const initialState: IForm = {
-  character: ICharacter = {};
-};
+---
 
-export function formReducer(state = initialState, action: IPayloadAction) {
+## Create form reducer
+Our reducer is reusble because it merges the new state at the provided path
+
+```ts
+import { lensPath, assocPath, merge } from 'ramda';
+import { initialState } from './initial-state';
+
+export function formReducer(state = initialState: IForm, action) {
   switch (action.type) {
   case 'SAVE_FORM':
-    return R.assoc(
-      'character',
-      R.merge(state.character, action.payload),
+    const lensForProp = lensPath(action.payload.path);
+    return assocPath(
+      action.payload.path,
+      merge(view(lensForProp, state), action.payload.value),
       state
     );
+  default:
+    return state;
   }
 }
 ```
 
 ---
 
-## Add a Save Form Action
-
-We also need a `SAVE_FORM` action to dispatch with the form as a payload
+## Create form template
+Use a template driven form with inputs double-bound to ngModel. 
+Mirror the structure of your form in state
 
 ```ts
-import {Action} from 'redux';
+<form #form="ngForm">
+  <label for="name">Character Name:</label>
+  <input
+    type="text"
+    name="name"
+    [(ngModel)]="characterForm.name">
 
-export interface IPayloadAction extends Action {
-  payload?: any;
-}
-
-export const saveForm = (form) => ({
-  type: 'SAVE_FORM',
-  payload: form
-});
+  <label for="age">Age:</label>
+  <input
+    type="number"
+    name="age"
+    [(ngModel)]="characterForm.bioSummary.age">
+</form>
 ```
 
 ---
 
-## Create our Form Component
+## Create form component
 
-We'll need Redux, our app state, our action, and NgForm to get started on our form component. `characterForm` will represent our form as it exists in state
+We'll need Redux, our app state, our action, and NgForm to get started on our form component. The `characterForm` object will represent our form and its values.
 
 ```ts
 import { Component } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { NgRedux, select } from 'ng2-redux';
 import { saveForm } from '../actions/index';
-import {IAppState} from '../store/store';
-import {NgForm} from '@angular/forms';
+import { IAppState } from '../store/store';
 
 @Component({
-  selector: 'rio-form',
-  template: `<form #form="ngForm"></form>`
+  selector: 'character-form',
+  template: require('./character-form.html')
 })
-export class RioForm {
+export class CharacterForm {
   @ViewChild(NgForm) ngForm: NgForm;
   characterForm;
   private formSubs;
@@ -107,19 +117,27 @@ export class RioForm {
 
 ---
 
-## Add a Subscription to the Store
+## Listen and dispatch
 
-We want to listen to value changes on the form and dispatch an action to update the state.
-
-We also want to subscribe to state to keep our private `characterForm` in sync with its values.
+`SAVE_FORM` will be dispatched automatically when the form is changed, along with the root path
 
 ```ts
 ngOnInit() {
+  // Subscribe to the form in state
   this.formSubs = this.ngRedux.select(state => state.form.character)
     .subscribe(characterForm => {
       this.characterForm = characterForm;
     });
-  this.ngForm.valueChanges.debounceTime(0).subscribe(change => this.ngRedux.dispatch(saveForm(change)));
+  // Dispatch an action when the form is changed
+  this.ngForm.valueChanges.debounceTime(0)
+    .subscribe(change =>
+      this.ngRedux.dispatch(
+        saveForm({
+          value: change,
+          path: ['character']
+        })
+      )
+    );
 }
 
 ngOnDestroy() {
@@ -129,64 +147,14 @@ ngOnDestroy() {
 
 ---
 
-## Add form field 
+## Add another form
 
-We use two-way binding on inputs to bind to `characterForm`
 
-```ts
-<form (ngSubmit)="onSubmit(form.value)" #form="ngForm">
-  <label for="name">Character Name:</label>
-  <input
-    type="text"
-    name="name"
-    #characterModel="ngModel"
-    [(ngModel)]="characterForm.name">
-</form>
-```
 
 ---
 
-## Add fieldsets to group data
+## Multi-entry fields
 
-Our form object doesn't need to be flat.
-
-```ts
-export interface ICharacter {
-  name?: string;
-  bioSummary: {
-    race: string;
-    alignment: string;
-};
-```
-
----
-
-## Add fieldsets to group data
-
-Specify the correct path when binding the input to `ngModel`
-
-```ts
-<fieldset ngModelGroup="bioSummary">
-  <label for="race">Race:</label>
-  <input
-    name="race"
-    [(ngModel)]="characterForm.bioSummary.race">
-  <label for="alignment">Alignment:</label>
-  <select
-    name="alignment"
-    [(ngModel)]="characterForm.bioSummary.alignment">
-    <option [value]="Good">Good</option>
-    <option [value]="Neutral">Neutral</option>
-    <option [value]="Evil">Evil</option>
-  </select>
-</fieldset>
-```
-
----
-
-## Expanding our reducer
-
-We can use generic actions for handling most of the form. Let's add another action that handles multi-entry form fields
 
 ```ts
 case 'ADD_SKILL':
@@ -267,6 +235,11 @@ export const removeSkill = index => ({
 - Selectors can compute data from the store
 - We can use reselect to computer the validity of our form data from the store, then tell our components about it
 
+### Benefits
+- Doing validation through selectors can give you performance improvements in some cases
+- Isolate all the validators to redux also makes these forms more portable if you want to put them in NativeScript for instance 
+- Add benefits of this approach... computing values, not changing the state all the time. can prioritize computation as opposed to changes in the store
+
 ---
 
 ## Setting up a simple selector 
@@ -315,3 +288,20 @@ Use select to subscribe to
   Save
 </button>
 ```
+
+---
+
+## Using generic validators
+
+
+---
+
+## Adding asynchronous validation
+
+
+---
+
+## Conclusion
+
+ This approach allows you to do anything because it's just JavaScript (or Typescript :P)
+ be creative, do what you need to do

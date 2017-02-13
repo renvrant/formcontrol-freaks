@@ -21,7 +21,8 @@ Enterprises love forms.
 
 - Many large forms means verbose, boilerplate code
 - Maintenance, API changes are hard to deal with
-- Template driven forms are just nicer.
+- Template driven forms are nicer but you can't use them with validation
+- Integrating with Redux can be tricky
 
 ---
 
@@ -32,25 +33,40 @@ Enterprises love forms.
 
 ---
 
-Redux can simplify forms too.
+Redux can improve forms too.
 
 ---
 
-## Forms with Redux
+## Why is this approach good?
+- Makes forms more declarative
 - Centralizes form data
-- Use template-driven forms with validation
+- Template-driven forms with validation
 - UX enhancements from Redux
 - Pure JS functions for business rules
 
 ---
 
-## In this Talk
+Hold on, doesn't this just move the boilerplate somewhere else?
+
+---
+
+## Why isn't this approach stupid?
+- On large-scale projects, the benefit will outweigh the cost
+- A single reducer can be used for many forms
+- Generic actions and validators can be re-used
+- Set it up once, use it many times
+
+---
+
+## In this talk
+- Creating forms in the store
+- Binding forms to state
+- Multi-entry fields
+- Validaton
+- Optimization
+
+---
+
+## Not in this talk
+- Redux 101
 - Adding Redux to your application
-- Creating a form reducer and basic actions
-- Creating a form subscription
-- Binding your form to state
-- Adding array values
-- Validating through reselect
-- Showing validation errors
-- Asynchronous validation
-- Optimization considerations
