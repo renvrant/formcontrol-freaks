@@ -1,6 +1,5 @@
 # FormControl Freaks: Redux Edition
 
-
 # Rangle.io
 ### Daniel Figueiredo & Renee Vrantsidis
 
@@ -13,40 +12,33 @@
 
 ---
 
-Enterprises love forms.
+## Enterprises love forms.
 
 ---
 
 ## The problem
 
-- Many large forms means verbose, boilerplate code
-- Maintenance, API changes are hard to deal with
-- Template driven forms are nicer but you can't use them with validation
-- Integrating with Redux can be tricky
+- Enterprises often require many long forms
+- These forms sometimes have weird rules
+- They cannot be template-driven
+- If you already use redux, integrating can be tricky
 
 ---
 
-## Managing complexity with Redux
-
-- Redux simplifies how we manage application state
-- All state information is centralized in the store
-
----
-
-Redux can improve forms too.
+## Redux can help.
 
 ---
 
 ## Why is this approach good?
-- Makes forms more declarative
-- Centralizes form data
-- Template-driven forms with validation
-- UX enhancements from Redux
-- Pure JS functions for business rules
+- Takes advantage of ngForm while moving your business logic out of the component/"view layer"
+- Centralizes form data, simplifying things for other parts of the app that need it
+- Declarative, template-driven forms, but with validation
+- UX enhancements - users can leave and come back with state rehydration
+- Pure JS functions are testable and extensible
 
 ---
 
-Hold on, doesn't this just move the boilerplate somewhere else?
+## Doesn't this just move the problem somewhere else?
 
 ---
 
@@ -54,7 +46,19 @@ Hold on, doesn't this just move the boilerplate somewhere else?
 - On large-scale projects, the benefit will outweigh the cost
 - A single reducer can be used for many forms
 - Generic actions and validators can be re-used
-- Set it up once, use it many times
+- Set it up once, use it many times (even in other frameworks like NativeScript!)
+
+---
+
+### To demonstrate, we needed an example app with lots of forms...
+
+---
+
+## Wizards Wizard
+A wizard to help you fill out a Dungeons & Dragons character sheet for your wizard.
+
+[ Live Link here with small walkthrough ]
+https://github.com/danielfigueiredo/wizards-wizard
 
 ---
 
@@ -69,4 +73,12 @@ Hold on, doesn't this just move the boilerplate somewhere else?
 
 ## Not in this talk
 - Redux 101
-- Adding Redux to your application
+
+---
+
+## Project Dependencies
+- Redux
+- NgRedux
+- Reselect
+- Ramda
+- RXJS
