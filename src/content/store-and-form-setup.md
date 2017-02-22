@@ -80,28 +80,6 @@ export function formReducer(state = initialState: IForm, action) {
 
 ---
 
-## Create form template
-Use a template driven form with inputs double-bound to ngModel. 
-Mirror the structure of your form in state
-
-```ts
-<form #form="ngForm">
-  <label for="name">Character Name:</label>
-  <input
-    type="text"
-    name="name"
-    [(ngModel)]="characterForm.name">
-
-  <label for="age">Age:</label>
-  <input
-    type="number"
-    name="age"
-    [(ngModel)]="characterForm.bioSummary.age">
-</form>
-```
-
----
-
 ## Create form component
 
 We'll need Redux, our app state, our action, and NgForm to get started on our form component. The `characterForm` object will represent our form and its values.
@@ -124,6 +102,28 @@ export class CharacterForm {
 
   constructor(private ngRedux: NgRedux<IAppState>) {}
 }
+```
+
+---
+
+## Create form template
+Use a template driven form with inputs double-bound to ngModel. 
+Mirror the structure of your form in state
+
+```html
+<form #form="ngForm">
+  <label for="name">Character Name:</label>
+  <input
+    type="text"
+    name="name"
+    [(ngModel)]="characterForm.name">
+
+  <label for="age">Age:</label>
+  <input
+    type="number"
+    name="age"
+    [(ngModel)]="characterForm.bioSummary.age">
+</form>
 ```
 
 ---

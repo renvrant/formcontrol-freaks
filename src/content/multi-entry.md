@@ -117,7 +117,7 @@ removeSkill(index) {
 ## Update our form template
 Using template directives, we create a repeating `select`
 
-```ts
+```html
 <label>Skills:</label>
 
 <div *ngFor="let skillSlot of characterForm.skills; let i = index;">

@@ -35,6 +35,7 @@
 - Declarative, template-driven forms, but with validation
 - UX enhancements - users can leave and come back with state rehydration
 - Pure JS functions are testable and extensible
+- Better typing and more testable 
 
 ---
 

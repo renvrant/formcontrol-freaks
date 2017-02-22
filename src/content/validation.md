@@ -4,12 +4,14 @@
 
 ## Validation as selectors
 - Selectors are middleware that can compute data from the store
-- We can use reselect to computer the validity of our form data from the store, then tell our components about it
-- computing values, not changing the state all the time. can prioritize computation as opposed to changes in the store
+- We don't have to track validity explicitly in the store - we can compute it, and update the store less
+- We can use reselect to compute the validity of our form data from the store, then tell our components about it
 
 ---
 
 ## Creating a character selector
+Selectors chain functions and pipe the return value of one function into the next. 
+`form.character` will be returned by this selector
 
 ```ts
 import { IAppState } from '../store/store';
@@ -27,7 +29,7 @@ const characterFormSelector = createSelector(
 ---
 
 ## Validating the entire form
-For now, we'll just validate that the fields are present
+For now let's just check for presence
 
 ```ts
 export const isFormValid = createSelector(
@@ -64,13 +66,6 @@ After selecting, we can use `isFormValid$` with the async pipe in our template
 
 ---
 
-## Creating generic validators
-
-TODO: Generic validators code snippets
-Show the creation of a generic validator (e.g. "is a number")
-
----
-
 ## Field-specific validation rules
 Much like we would create validators, we can create specific rules per-field
 
@@ -95,36 +90,122 @@ export const isAgeValidSelector = createSelector(
 
 ---
 
-## Selecting multiple validators
-
-TODO: Show how you can chain a generic with a specific validator to compute any given field's validity
-
----
-
-## Updating `isFormValid`
-
-TODO: Show the modified computation of form validity
-
----
-
-## Adding validation errors
-We still have access to Angular's FormControl states and we can us them to show error messages
+## Creating generic validators (2/3)
+You can create a generic validator function to be used with reselect
 
 ```ts
-<input
-  id="age"
-  type="number"
-  name="age"
-  #ageModel="ngModel"
-  [(ngModel)]="characterForm.bioSummary.age">
-<div
-  [hidden]="isAgeValid || ageModel.control.pristine">
-  That age doesn't seem likely! Are you sure it's appropriate for the race you picked?
-</div>
+export const isValid = (...validators): any => {
+  return (arg: any) => {
+    for (const val of validators) {
+      if (!val(arg)) {
+        return false;
+      }
+    }
+    return true;
+  };
+};
 ```
 
 ---
 
-## Adding asynchronous validation
+## Creating generic validators (2/3)
+Then create validation functions
 
-TODO: Async validation
+```ts
+export const maxNumberValidation = (max: number) =>
+  (value: number) => value < max;
+export const maxStringLengthValidation = (max: number) =>
+  (value: string) => value.length < max;
+export const minStringLengthValidation = (min: number) =>
+  (value: string) => value.length > min;
+```
+
+---
+
+## Creating generic validation (3/3)
+Then pipe your validation rules into `isValid`
+
+```ts
+export const createFormFieldSelector = (fieldPath: string[]) => createSelector(
+  formStateSelector,
+  (form: IForm) => path(fieldPath, form)
+);
+
+export const isNameValidSelector = createSelector(
+  createFormFieldSelector(['character', 'name']),
+  isValid(
+    maxStringLengthValidation(50),
+    minStringLengthValidation(3),
+  ),
+);
+```
+
+---
+
+## Generic validation alternative
+Or, if you're not comfortable with closures...
+
+```ts
+export const maxStringLengthValidation = (value: string, max: number) =>
+  value.length < max;
+export const minStringLengthValidation = (value: string, min: number) =>
+  value.length > min;
+
+export const isNameValidSelector = createSelector(
+  createFormFieldSelector(['character', 'name']),
+  (name: string) => maxStringLengthValidation(name, 50)
+    && minStringLengthValidation(name, 3)
+);
+```
+
+---
+
+## Updating `isFormValid`
+Once we have a list of validation rules for our fields, we can chain those selectors together
+
+```ts
+export const isFormValidSelector = createSelector(
+  isAgeValidSelector,
+  isNameValidSelector,
+  (ageValid, nameValid) => ageValid 
+    && nameValid
+```
+
+---
+
+## Adding validation errors (1/2)
+We can subscribe to the selectors we've made and use them in our template
+
+```ts
+import {
+  isFormValidSelector,
+  isAgeValidSelector,
+  isNameValidSelector,
+} from '../selectors/character';
+
+...
+
+@select(isAgeValidSelector)
+  isAgeValid$: Observable<boolean>;
+@select(isNameValidSelector)
+  isNameValid$: Observable<boolean>;
+```
+
+---
+
+## Adding validation errors (2/2)
+
+We have access to Angular's FormControl states and we can us them to show error messages
+
+```html
+<input
+  id="name"
+  type="text"
+  name="name"
+  #nameField="ngModel"
+  [(ngModel)]="characterForm.name">
+<div
+  [hidden]="isNameValid || nameField.control.pristine">
+  Name must be between 3 and 50 characters
+</div>
+```
