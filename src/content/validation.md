@@ -3,14 +3,14 @@
 ---
 
 ## Validation as selectors
-- Selectors are middleware that can compute data from the store
-- We don't have to track validity explicitly in the store - we can compute it, and update the store less
-- We can use reselect to compute the validity of our form data from the store, then tell our components about it
+- Selectors can compute data from the store through function composition
+- No actions for validations, less updates in the store
+- Reselect and memoization benefits
 
 ---
 
 ## Creating a character selector
-Selectors chain functions and pipe the return value of one function into the next. 
+Selectors chain functions and pipe their return values into the final function 
 `form.character` will be returned by this selector
 
 ```ts
@@ -29,7 +29,7 @@ const characterFormSelector = createSelector(
 ---
 
 ## Validating the entire form
-For now let's just check for presence
+For now let's just check for required fields
 
 ```ts
 export const isFormValid = createSelector(
@@ -70,46 +70,45 @@ After selecting, we can use `isFormValid$` with the async pipe in our template
 Much like we would create validators, we can create specific rules per-field
 
 ```ts
-export const isAgeValidSelector = createSelector(
+const humanAgeValid = isBetweenNumber(14, 40);
+const elfAgeValid = isBetweenNumber(80, 800);
+const tieflingAgeValid = isBetweenNumber(35, 53);
+
+const ageValidationSelector = createSelector(
   bioSummarySelector,
   (bioSummary: IBioSummary) => {
     if (!bioSummary.race) {
-      return false;
+      return () => true;
     }
     switch (bioSummary.race) {
-    case 'Human':
-      return gte(bioSummary.age, 14) && lte(bioSummary.age, 40);
-    case 'Elf':
-      return gte(bioSummary.age, 80) && lte(bioSummary.age, 800);
-    case 'Tiefling':
-      return gte(bioSummary.age, 35) && lte(bioSummary.age, 53);
+      case 'Human': return humanAgeValid;
+      case 'Elf': return elfAgeValid;
+      case 'Tiefling': return tieflingAgeValid;
     }
   }
+);
+
+export const isAgeValidSelector = createSelector(
+  bioSummarySelector,
+  ageValidationSelector,
+  ({age}, isAgeValid) => isAgeValid(age)
 );
 ```
 
 ---
 
-## Creating generic validators (2/3)
-You can create a generic validator function to be used with reselect
+## Creating generic validators (1/3)
+You can create a generic function to check multiple validations
 
 ```ts
-export const isValid = (...validators): any => {
-  return (arg: any) => {
-    for (const val of validators) {
-      if (!val(arg)) {
-        return false;
-      }
-    }
-    return true;
-  };
-};
+export const isValid = (...validators): any =>
+  (arg: any) => isNil(find(val => !val(arg), validators));
 ```
 
 ---
 
 ## Creating generic validators (2/3)
-Then create validation functions
+Then create small validation functions
 
 ```ts
 export const maxNumberValidation = (max: number) =>

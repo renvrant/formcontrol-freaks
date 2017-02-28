@@ -82,7 +82,8 @@ export function formReducer(state = initialState: IForm, action) {
 
 ## Create form component
 
-We'll need Redux, our app state, our action, and NgForm to get started on our form component. The `characterForm` object will represent our form and its values.
+The component needs the state, actions, NgForm, and our form `characterForm`.
+
 
 ```ts
 import { Component } from '@angular/core';
