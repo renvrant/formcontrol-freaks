@@ -30,12 +30,13 @@
 ---
 
 ## Why is this approach good?
-- Takes advantage of ngForm while moving your business logic out of the component/"view layer"
-- Centralizes form data, simplifying things for other parts of the app that need it
-- Declarative, template-driven forms, but with validation
-- UX enhancements - users can leave and come back with state rehydration
+- Separation of concerns taking advantage of ngForm
+- Centralizes form data, easier abstraction on common operations
+- Declarative and template-driven forms
+- Framework agnostic validations
+- UX enhancements - form data on local storage
 - Pure JS functions are testable and extensible
-- Better typing and more testable 
+- Better typings 
 
 ---
 
@@ -45,8 +46,8 @@
 
 ## Why isn't this approach stupid?
 - On large-scale projects, the benefit will outweigh the cost
-- A single reducer can be used for many forms
-- Generic actions and validators can be re-used
+- A single parent reducer manages generic form operations
+- Computed validations on selectors
 - Set it up once, use it many times (even in other frameworks like NativeScript!)
 
 ---
@@ -67,7 +68,7 @@ https://github.com/danielfigueiredo/wizards-wizard
 - Creating forms in the store
 - Binding forms to state
 - Multi-entry fields
-- Validaton
+- Validation
 - Optimization
 
 ---
@@ -78,8 +79,8 @@ https://github.com/danielfigueiredo/wizards-wizard
 ---
 
 ## Project Dependencies
-- Redux
-- NgRedux
-- Reselect
-- Ramda
-- RXJS
+- [Redux](https://github.com/reactjs/redux)
+- [@angular-redux/store](https://github.com/angular-redux/store)
+- [Reselect](https://github.com/reactjs/reselect)
+- [Ramda](ramdajs.com)
+- [RXJS](https://github.com/Reactive-Extensions/RxJS)
