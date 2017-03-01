@@ -77,9 +77,6 @@ const tieflingAgeValid = isBetweenNumber(35, 53);
 const ageValidationSelector = createSelector(
   bioSummarySelector,
   (bioSummary: IBioSummary) => {
-    if (!bioSummary.race) {
-      return () => true;
-    }
     switch (bioSummary.race) {
       case 'Human': return humanAgeValid;
       case 'Elf': return elfAgeValid;

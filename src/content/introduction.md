@@ -68,7 +68,7 @@ https://github.com/danielfigueiredo/wizards-wizard
 - Creating forms in the store
 - Binding forms to state
 - Multi-entry fields
-- Validaton
+- Validation
 - Optimization
 
 ---
@@ -79,8 +79,8 @@ https://github.com/danielfigueiredo/wizards-wizard
 ---
 
 ## Project Dependencies
-- Redux
-- NgRedux
-- Reselect
-- Ramda
-- RXJS
+- [Redux](https://github.com/reactjs/redux)
+- [@angular-redux/store](https://github.com/angular-redux/store)
+- [Reselect](https://github.com/reactjs/reselect)
+- [Ramda](ramdajs.com)
+- [RXJS](https://github.com/Reactive-Extensions/RxJS)
