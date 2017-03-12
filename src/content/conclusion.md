@@ -1,8 +1,12 @@
+## Doesn't this just move the problem somewhere else?
 
-## Conclusion
-- This approach allows you to do anything because it's just JavaScript (or Typescript)
-- Be creative, do what you need to do
-- Take control over your forms!
+---
+
+## Why isn't this approach stupid?
+- On large-scale projects, the benefit will outweigh the cost
+- A single reducer can be used for many forms
+- Generic actions and validators can be re-used
+- Set it up once, use it many times (even in other frameworks like NativeScript!)
 
 ---
 
