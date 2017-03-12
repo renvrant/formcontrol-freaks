@@ -26,11 +26,11 @@
 
 ---
 
-## Why is this approach good?
+## Why back forms with Redux?
 - Moves your form setup out of the component
-- Centralizes form data, simplifying things for other parts of the app that need it
-- Declarative, template-driven forms, but with validation
-- UX enhancements - users can leave and come back with state rehydration
+- Centralizes form data, easier abstraction on common operations
+- Declarative and template-driven forms (with validation!)
+- UX enhancements - form data in local storage
 - Pure JS functions are testable, typable and extensible
 
 ---
@@ -53,3 +53,21 @@ A wizard to help you fill out a Dungeons & Dragons character sheet for your wiza
 
 [ Live Link here with small walkthrough ]
 https://github.com/danielfigueiredo/wizards-wizard
+
+---
+
+## In this talk
+- Creating forms in the store
+- Binding forms to state
+- Multi-entry fields
+- Validation
+- Optimization
+
+---
+
+## Project Dependencies
+- [Redux](https://github.com/reactjs/redux)
+- [@angular-redux/store](https://github.com/angular-redux/store)
+- [Reselect](https://github.com/reactjs/reselect)
+- [Ramda](ramdajs.com)
+- [RXJS](https://github.com/Reactive-Extensions/RxJS)
