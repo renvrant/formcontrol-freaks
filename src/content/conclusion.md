@@ -1,8 +1,12 @@
+## Wrapping up...
+
+---
+
 ## Doesn't this just move the problem somewhere else?
 
 ---
 
-## Why isn't this approach stupid?
+## Why bother?
 - On large-scale projects, the benefit will outweigh the cost
 - A single reducer can be used for many forms
 - Generic actions and validators can be re-used
@@ -10,10 +14,10 @@
 
 ---
 
-## Extra Info
+# Thank you!
 
-- Slides: https://github.com/renvrant/formcontrol-freaks
-- Repo: https://github.com/danielfigueiredo/wizards-wizard
+Slides: https://github.com/renvrant/formcontrol-freaks
 
-- Renee: @renvrant
-- Daniel: @... 
+Demo: https://github.com/danielfigueiredo/wizards-wizard
+
+@danfigueiredoc / @renvrant

@@ -2,21 +2,6 @@
 
 ---
 
-## Create form in the store
-Your form will be an object that uses a single reducer
-
-```ts
-export interface IAppState {
-  form?: IForm;
-}
-
-export const rootReducer = combineReducers<IAppState>({
-  form: formReducer
-});
-```
-
----
-
 ## Plan the shape of your form 
 You can structure your store however you like
 We'll use `form.character` to represent a character form in this example

@@ -94,6 +94,19 @@ export const isAgeValidSelector = createSelector(
 
 ---
 
+## Updating `isFormValid`
+Once we have a list of validation rules for our fields, we can chain those selectors together
+
+```ts
+export const isFormValidSelector = createSelector(
+  isAgeValidSelector,
+  isNameValidSelector,
+  (ageValid, nameValid) => ageValid 
+    && nameValid
+```
+
+---
+
 ## Creating generic validators (1/3)
 You can create a generic function to check multiple validations
 
@@ -152,19 +165,6 @@ export const isNameValidSelector = createSelector(
   (name: string) => maxStringLengthValidation(name, 50)
     && minStringLengthValidation(name, 3)
 );
-```
-
----
-
-## Updating `isFormValid`
-Once we have a list of validation rules for our fields, we can chain those selectors together
-
-```ts
-export const isFormValidSelector = createSelector(
-  isAgeValidSelector,
-  isNameValidSelector,
-  (ageValid, nameValid) => ageValid 
-    && nameValid
 ```
 
 ---

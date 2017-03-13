@@ -13,8 +13,7 @@
 
 ---
 
-## The problem
-
+## Pain points
 - Enterprises often require many long forms
 - These forms sometimes have weird rules
 - They cannot be template-driven, creating a lot of boilerplate
@@ -26,7 +25,7 @@
 
 ---
 
-## Why back forms with Redux?
+## Why?
 - Moves your form setup out of the component
 - Centralizes form data, easier abstraction on common operations
 - Declarative and template-driven forms (with validation!)
@@ -35,33 +34,15 @@
 
 ---
 
-## In this talk
-How to create Redux-backed forms:
-- Creating forms in the store
-- Binding forms to state
-- Multi-entry fields
-- Validation
-
----
-
 ### To demonstrate, we needed an example app with lots of forms...
 
 ---
 
-## Wizards Wizard
-A wizard to help you fill out a Dungeons & Dragons character sheet for your wizard.
-
-[ Live Link here with small walkthrough ]
-https://github.com/danielfigueiredo/wizards-wizard
-
----
-
 ## In this talk
-- Creating forms in the store
-- Binding forms to state
-- Multi-entry fields
-- Validation
-- Optimization
+- Setting up forms to work with Redux
+- Adding form data to state
+- Supporting multi-entry fields
+- Validation with reselect
 
 ---
 
