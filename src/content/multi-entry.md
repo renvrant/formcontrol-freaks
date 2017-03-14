@@ -3,15 +3,14 @@
 
 ---
 
-## Multi-entry fields
-Fields whose values will be stored as an array:
-- Repeatable fields
-- Select many fields
-- A list of checkboxes
+## What's a multi-entry field?
+Fields whose values will be stored as an array
 
----
-
-### Wizards need skills.
+```ts
+character: {
+  skills: ['Climb', 'Knowledge Arcana'],
+}
+```
 
 ---
 
@@ -83,11 +82,6 @@ case 'REMOVE_INDEXED_FORM_VALUE':
 These new actions let us add a list of skills
 
 ```ts
-import { skills } from '../mocks';
-import { addIntoArray, putInArray, removeFromArray } from '../actions';
-
-...
-
 onSelectSkill({event, index}) {
   const skill = event.target.value;
   this.ngRedux.dispatch(putInArray({

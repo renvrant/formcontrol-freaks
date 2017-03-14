@@ -5,31 +5,25 @@
 
 ---
 
-## Enterprises are adopting Angular.
+## What's a Rangle?
+- We build Angular (and other JS) apps
+- We use Redux/NgRx for state management
+- We work with a lots of clients, and we noticed a pattern...
 
 ---
 
-## Enterprises love forms.
+## Redux can power up your forms
 
 ---
 
-## Pain points
-- Enterprises often require many long forms
-- These forms sometimes have weird rules
-- They cannot be template-driven, creating a lot of boilerplate
-- If you're using Redux, integrating can be tricky
-
----
-
-## Redux can power up your forms.
+## (And you probably have a lot of forms)
 
 ---
 
 ## Why?
-- Moves your form setup out of the component
+- Lower maintenance cost on large-scale apps from moving form setup out of components
 - Centralizes form data, easier abstraction on common operations
 - Declarative and template-driven forms (with validation!)
-- UX enhancements - form data in local storage
 - Pure JS functions are testable, typable and extensible
 
 ---
@@ -42,13 +36,4 @@
 - Setting up forms to work with Redux
 - Adding form data to state
 - Supporting multi-entry fields
-- Validation with reselect
-
----
-
-## Project Dependencies
-- [Redux](https://github.com/reactjs/redux)
-- [@angular-redux/store](https://github.com/angular-redux/store)
-- [Reselect](https://github.com/reactjs/reselect)
-- [Ramda](ramdajs.com)
-- [RXJS](https://github.com/Reactive-Extensions/RxJS)
+- Framework-agnostic validation with selectors

@@ -5,7 +5,7 @@
 ## Validation as selectors
 - Selectors can compute data from the store through function composition
 - No actions for validations, less updates in the store
-- Reselect and memoization benefits
+- Memoization benefits if using reselect
 
 ---
 
@@ -107,6 +107,24 @@ export const isFormValidSelector = createSelector(
 
 ---
 
+## Generic validation
+Often you'll want to make a selector out of re-usable validation functions
+
+```ts
+export const maxStringLengthValidation = (value: string, max: number) =>
+  value.length < max;
+export const minStringLengthValidation = (value: string, min: number) =>
+  value.length > min;
+
+export const isNameValidSelector = createSelector(
+  createFormFieldSelector(['character', 'name']),
+  (name: string) => maxStringLengthValidation(name, 50)
+    && minStringLengthValidation(name, 3)
+);
+```
+
+---
+
 ## Creating generic validators (1/3)
 You can create a generic function to check multiple validations
 
@@ -146,24 +164,6 @@ export const isNameValidSelector = createSelector(
     maxStringLengthValidation(50),
     minStringLengthValidation(3),
   ),
-);
-```
-
----
-
-## Generic validation alternative
-Or, if you're not comfortable with closures...
-
-```ts
-export const maxStringLengthValidation = (value: string, max: number) =>
-  value.length < max;
-export const minStringLengthValidation = (value: string, min: number) =>
-  value.length > min;
-
-export const isNameValidSelector = createSelector(
-  createFormFieldSelector(['character', 'name']),
-  (name: string) => maxStringLengthValidation(name, 50)
-    && minStringLengthValidation(name, 3)
 );
 ```
 

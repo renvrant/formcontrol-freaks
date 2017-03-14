@@ -4,9 +4,13 @@
 
 ## Plan the shape of your form 
 You can structure your store however you like
-We'll use `form.character` to represent a character form in this example
+`form.character` will represent a character form in this example
 
 ```ts
+export interface IForm {
+  character: ICharacter;
+}
+
 export interface ICharacter {
   name?: string;
   bioSummary: IBioSummary;
@@ -18,16 +22,12 @@ export interface IBioSummary {
   alignment: string;
   race: string;
 }
-
-export interface IForm {
-  character: ICharacter;
-}
 ```
 
 ---
 
 ## Setting up actions
-Action payloads include the path to the form in the store 
+Action payloads include the path to the form in the store
 
 ```ts
 export const saveForm = (path, value) => ({
@@ -42,7 +42,7 @@ export const saveForm = (path, value) => ({
 ---
 
 ## Create form reducer
-Our reducer is reusble because it merges the new state at the provided path
+Including a path in the payload makes this reducer reusable for other forms
 
 ```ts
 import { lensPath, assocPath, merge } from 'ramda';
@@ -67,9 +67,6 @@ export function formReducer(state = initialState: IForm, action) {
 
 ## Create form component
 
-The component needs the state, actions, NgForm, and our form `characterForm`.
-
-
 ```ts
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
@@ -83,7 +80,7 @@ import { IAppState } from '../store/store';
 })
 export class CharacterForm {
   @ViewChild(NgForm) ngForm: NgForm;
-  characterForm;
+  public characterForm;
   private formSubs;
 
   constructor(private ngRedux: NgRedux<IAppState>) {}
@@ -93,8 +90,7 @@ export class CharacterForm {
 ---
 
 ## Create form template
-Use a template driven form with inputs double-bound to ngModel. 
-Mirror the structure of your form in state
+Use a template driven form and bind your inputs to object retrieved from state
 
 ```html
 <form #form="ngForm">
@@ -116,14 +112,14 @@ Mirror the structure of your form in state
 
 ## Listen and dispatch
 
-`SAVE_FORM` will be dispatched automatically when the form is changed, along with the root path
+`SAVE_FORM` will be dispatched automatically when the form is changed
 
 ```ts
 ngOnInit() {
   // Subscribe to the form in state
   this.formSubs = this.ngRedux.select(state => state.form.character)
-    .subscribe(characterForm => {
-      this.characterForm = characterForm;
+    .subscribe(characterFormState => {
+      this.characterForm = characterFormState;
     });
   // Dispatch an action when the form is changed
   this.ngForm.valueChanges.debounceTime(0)
@@ -135,10 +131,6 @@ ngOnInit() {
         )
       )
     );
-}
-
-ngOnDestroy() {
-  this.formSubs.unsubscribe();
 }
 ```
 
