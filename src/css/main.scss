@@ -81,11 +81,6 @@ $selectionColor: #fff;
   font-weight: lighter;
 }
 
-//Alignment
-.reveal .slides {
-  text-align: left;
-}
-
 .reveal table {
   margin: 20px 0;
 }
@@ -105,6 +100,9 @@ $selectionColor: #fff;
 }
 
 // Headers
+.reveal h1 {
+  text-align: left;
+}
 .reveal h1:after,
 .reveal h2:after {
   content: '';
@@ -113,6 +111,9 @@ $selectionColor: #fff;
   height: 4px;
   width: 2em;
   margin: 0.25em 0;
+}
+.reveal h2:after {
+  margin: 0.25em auto;
 }
 
 #rangle-io:after {
@@ -134,4 +135,14 @@ $selectionColor: #fff;
   width: auto;
   font-size: 0.85em;
   max-height: none;
+}
+
+.reveal ul {
+  max-width: 840px;
+}
+
+.reveal section img {
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }

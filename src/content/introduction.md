@@ -12,7 +12,7 @@
 
 ---
 
-## Redux can power up your forms
+## Redux can level up your forms
 
 ---
 
@@ -33,7 +33,19 @@
 ---
 
 ## In this talk
-- Setting up forms to work with Redux
+- Your forms + Redux magic
 - Adding form data to state
 - Supporting multi-entry fields
 - Framework-agnostic validation with selectors
+
+---
+
+## Not in this talk
+- Redux 101
+
+---
+
+## We'll be using...
+- Redux & angular-redux (but NgRx will work)
+- Ramda (utilities for our reducer)
+- Reselect (for selectors)

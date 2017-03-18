@@ -37,7 +37,6 @@ export const removeFromArray = (index, path) => ({
 ---
 
 ## Updating the reducer (1/2)
-Import some array methods from ramda to keep our state immutable
 
 ```ts
 import { concat, remove, update } from 'ramda';

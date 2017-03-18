@@ -2,11 +2,23 @@
 
 ---
 
-## Plan the shape of your form 
-You can structure your store however you like
-`form.character` will represent a character form in this example
+## One reducer to rule them all
+We want a single form reducer to handle all of our forms
+(and in the darkness bind them)
 
 ```ts
+export const rootReducer = combineReducers<IAppState>({
+  form: formReducer,
+});
+```
+
+---
+
+## Plan your structure
+Your form can be structured however you want on the store
+
+```ts
+// The interface our reducer will use
 export interface IForm {
   character: ICharacter;
 }
@@ -26,15 +38,35 @@ export interface IBioSummary {
 
 ---
 
+## Reduce, reuse...
+
+Plan any other forms you want to add to your form state
+
+```ts
+export interface IForm {
+  character: ICharacter; // state.form.character
+  equipment: IEquipment; // state.form.equipment
+}
+
+export interface IEquipment {
+  weaponName?: string;
+  weaponType: string;
+  armorType: string;
+}
+```
+
+---
+
 ## Setting up actions
+
 Action payloads include the path to the form in the store
 
 ```ts
 export const saveForm = (path, value) => ({
   type: 'SAVE_FORM',
   payload: {
-    path,
-    value
+    path, // ['character'] would be form.character
+    value,
   }
 });
 ```
@@ -42,11 +74,10 @@ export const saveForm = (path, value) => ({
 ---
 
 ## Create form reducer
-Including a path in the payload makes this reducer reusable for other forms
+Our form changes will be merged at the provided path
 
 ```ts
 import { lensPath, assocPath, merge } from 'ramda';
-import { initialState } from './initial-state';
 
 export function formReducer(state = initialState: IForm, action) {
   switch (action.type) {
@@ -65,32 +96,8 @@ export function formReducer(state = initialState: IForm, action) {
 
 ---
 
-## Create form component
-
-```ts
-import { Component } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { NgRedux, select } from 'ng2-redux';
-import { saveForm } from '../actions/index';
-import { IAppState } from '../store/store';
-
-@Component({
-  selector: 'character-form',
-  template: require('./character-form.html')
-})
-export class CharacterForm {
-  @ViewChild(NgForm) ngForm: NgForm;
-  public characterForm;
-  private formSubs;
-
-  constructor(private ngRedux: NgRedux<IAppState>) {}
-}
-```
-
----
-
 ## Create form template
-Use a template driven form and bind your inputs to object retrieved from state
+In `character-form.html`...
 
 ```html
 <form #form="ngForm">
@@ -110,49 +117,56 @@ Use a template driven form and bind your inputs to object retrieved from state
 
 ---
 
-## Listen and dispatch
+## Create form component
+In `character-form.ts`... 
 
-`SAVE_FORM` will be dispatched automatically when the form is changed
+```ts
+import { Component } from '@angular/core';
+import { NgForm } from '@angular/forms';
+import { NgRedux, select } from 'angular-redux';
+import { saveForm } from '../actions/index';
+import { IAppState } from '../store/store';
+
+@Component({
+  selector: 'character-form',
+  template: require('./character-form.html')
+})
+export class CharacterForm {
+  @ViewChild(NgForm) ngForm: NgForm;
+  public characterForm;
+  private formSubs;
+
+  constructor(private ngRedux: NgRedux<IAppState>) {}
+}
+```
+
+---
+
+## Listen and dispatch
+`SAVE_FORM` will be dispatched automatically when the form value changes
 
 ```ts
 ngOnInit() {
+  // Dispatch an action when the form is changed
+  this.ngForm.valueChanges.debounceTime(0)
+    .subscribe(formValues => this.ngRedux.dispatch(
+      saveForm(
+        ['character'], // path on the store
+        formValues,
+      )
+    ));
   // Subscribe to the form in state
   this.formSubs = this.ngRedux.select(state => state.form.character)
     .subscribe(characterFormState => {
       this.characterForm = characterFormState;
     });
-  // Dispatch an action when the form is changed
-  this.ngForm.valueChanges.debounceTime(0)
-    .subscribe(change =>
-      this.ngRedux.dispatch(
-        saveForm(
-          change,
-          ['character']
-        )
-      )
-    );
 }
 ```
 
 ---
 
-### Our form is now writing to state!
+![Redux Flow](content/images/store-component-flow.png "Redux Flow")
 
 ---
 
-## Reduce, reuse...
-Other forms can use the same reducer
-Both `form.character` and `form.equipment` will use the `formReducer`
-
-```ts
-export interface IEquipment {
-  weaponName?: string;
-  weaponType: string;
-  armorType: string;
-}
-
-export interface IForm {
-  character: ICharacter;
-  equipment: IEquipment;
-}
-```
+![Alternative Diagram](content/images/store-component-flow-lolz.png "Redux Flow")

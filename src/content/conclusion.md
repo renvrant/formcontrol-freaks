@@ -2,15 +2,23 @@
 
 ---
 
-## Doesn't this just move the problem somewhere else?
+## Why should I bother?
 
 ---
 
-## Why bother?
-- On large-scale projects, the benefit will outweigh the cost
-- A single reducer can be used for many forms
-- Generic actions and validators can be re-used
-- Set it up once, use it many times (even in other frameworks like NativeScript!)
+## It's re-usable
+
+---
+
+## It's portable
+
+---
+
+## It's scalable
+
+---
+
+## You can work magic with your form data
 
 ---
 
