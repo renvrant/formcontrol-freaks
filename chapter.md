@@ -472,7 +472,12 @@ to make `characterForm` watch the character portion of our Redux state.
 
 ![Redux Flow Diagram](./redux-flow-diagram.png)
 
-In more detail:
+Looking once more at the diagram,
+there is a potential circularity in the updates.
+Angular avoids an infinite loop by breaking the cycle
+when `characterForm` and the form's actual internal data are the same.
+
+Looking more closely at the code used to create all of this:
 
 *   The `@Component` decorator in the code above tells Angular that
     this class is used to fill in `<character-form>` elements
@@ -488,8 +493,6 @@ In more detail:
     our data will live in this store,
     and when we're testing,
     we can inject a mock object here to give us more insight.
-
-FIXME: @danielfigueira write a paragraph here about ngForm and how we avoid an infinite loop
 
 > The `formSubs` instance variable is the odd one out in this class.
 > Its job is to store the observer/observable subscription
@@ -736,6 +739,183 @@ we can write the HTML needed to put everything in front of the user:
 
 The last line of this HTML is the one that lets users add skills;
 the rest is to handle skill display and removal.
+
+## The Payoff: Validation
+
+One way to see how these changes pays off is to look at validation,
+and in particular at the way in which we can use *selectors* to compute data by composing functions,
+and then use *memoization* to make state changes more efficient.
+
+Selectors chain functions together
+and pipe their return values into the last function in the chain.
+In the simple code below,
+the selector will return `form.character`:
+
+```ts
+const formStateSelector = (state: IAppState) => state.form;
+
+const characterFormSelector = createSelector(
+  formStateSelector,
+  (form: IForm) => form.character
+);
+```
+
+With that in hand,
+let's write a validation function that checks that all required fields are present
+and add it to our component:
+
+```ts
+export const isFormValid = createSelector(
+  characterFormSelector,
+  character => character.name
+    && character.bioSummary.age
+    && character.skills.length > 0
+);
+
+@select(isFormValidSelector)
+isFormValid$: Observable<boolean>;
+```
+
+Now,
+after selecting,
+we can use `isFormValid$` with an asynchronous pipe in our template:
+
+```ts
+<button 
+  [disabled]="!(isFormValid$ | async)"
+  type="submit">
+  Save
+</button>
+```
+
+(The `$` on the end of `isFormValid$` is a convention in the RxJS library meaning,
+"This is an observable."
+We don't have to use it,
+but we find it helps make code easier to understand.)
+
+We can now go ahead and create specific rules for specific fields of our form
+using a helper function called `isBetweenNumber` that does exactly what you'd expect:
+
+```ts
+const humanAgeValid = isBetweenNumber(14, 40);
+const elfAgeValid = isBetweenNumber(80, 800);
+const tieflingAgeValid = isBetweenNumber(35, 53);
+
+const bioSummarySelector = createSelector(
+  characterFormSelector,
+  ({bioSummary}: ICharacter) => bioSummary
+);
+
+const ageValidationSelector = createSelector(
+  bioSummarySelector,
+  (bioSummary: IBioSummary) => {
+    switch (bioSummary.race) {
+      case 'Human': return humanAgeValid;
+      case 'Elf': return elfAgeValid;
+      case 'Tiefling': return tieflingAgeValid;
+    }
+  }
+);
+
+export const isAgeValidSelector = createSelector(
+  bioSummarySelector,
+  ageValidationSelector,
+  ({age}, isAgeValid) => isAgeValid(age)
+);
+```
+
+Once we have a pile of validation rules for our fields,
+we can chain those selectors together like this:
+
+```ts
+const isFormValidSelector = createSelector(
+  isAgeValidSelector,
+  isNameValidSelector,
+  (ageValid, nameValid) => ageValid && nameValid
+);
+```
+
+In larger applications,
+we can and should go further
+and make selectors out of reusable validation functions:
+
+```ts
+const maxStringLengthValidation = (value: string, max: number) =>
+  value.length < max;
+
+const minStringLengthValidation = (value: string, min: number) =>
+  value.length > min;
+
+const isNameValidSelector = createSelector(
+  createFormFieldSelector(['character', 'name']),
+  (name: string) => maxStringLengthValidation(name, 50)
+    && minStringLengthValidation(name, 3)
+);
+```
+
+Once we're doing this,
+we will probably also want to create a generic function
+to check multiple validations:
+
+```ts
+const isValid = (...validators): any =>
+  (arg: any) => isNil(find(val => !val(arg), validators));
+```
+
+and then go back and create smaller validation functions:
+
+```ts
+const maxNumberValidation = (max: number) =>
+  (value: number) => value < max;
+
+const maxStringLengthValidation = (max: number) =>
+  (value: string) => value.length < max;
+
+const minStringLengthValidation = (min: number) =>
+  (value: string) => value.length > min;
+```
+
+so that we can pipe our validation rules into the generic `isValid`:
+
+```ts
+const createFormFieldSelector = (fieldPath: string[]) => createSelector(
+  formStateSelector,
+  (form: IForm) => path(fieldPath, form)
+);
+
+const isNameValidSelector = createSelector(
+  createFormFieldSelector(['character', 'name']),
+  isValid(
+    maxStringLengthValidation(50),
+    minStringLengthValidation(3),
+  ),
+);
+```
+
+We can make our application more user-friendly
+by subscribing to the selectors we've made and using them in our template:
+
+```ts
+@select(isAgeValidSelector)
+  isAgeValid$: Observable<boolean>;
+
+@select(isNameValidSelector)
+  isNameValid$: Observable<boolean>;
+```
+
+Since we have access to Angular's `FormControl` states,
+we can us them to show error messages:
+
+<input
+  id="name"
+  type="text"
+  name="name"
+  #nameField="ngModel"
+  [(ngModel)]="characterForm.name">
+<div
+  [hidden]="isNameValid || nameField.control.pristine">
+  Name must be between 3 and 50 characters
+</div>
 
 ## Conclusion
 
