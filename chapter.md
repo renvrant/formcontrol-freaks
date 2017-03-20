@@ -264,10 +264,10 @@ export interface IBioSummary {
 }
 ```
 
-**FIXME: @renvrant https://github.com/renvrant/formcontrol-freaks/pull/3#discussion_r106822417**
-
-These interfaces define a store
-that contains a single object representing a character,
+These interfaces define the shape of a form in our Redux store,
+which is the part of the store our reducer will be concerned with in this example,
+but do *not* actually create the store.
+The form contains a single object representing a character,
 rather than using the character itself as the store.
 That way,
 if we want to add other top-level items in future,
@@ -395,8 +395,6 @@ a library of functional utilities for JavaScript:
 With these helpers in hand,
 our `formReducer` looks like this:
 
-FIXME: @renvrant can you please check against https://github.com/renvrant/formcontrol-freaks/pull/3#discussion_r106822741
-
 ```ts
 import { path, assocPath, merge } from 'ramda';
 
@@ -484,13 +482,14 @@ In more detail:
     We need this because we are going to subscribe to event notifications from that form
     later on.
 *   The `characterForm` instance variable is our working copy of the form's state.
-    FIXME: @renvrant @danielfigueiredo @gvwilson to discuss https://github.com/renvrant/formcontrol-freaks/pull/3#discussion_r106822848
 *   Finally, `private ngRedux: NgRedux<IAppState>` triggers Angular's dependency injection
     and gives us access to the Redux store.
     When our application is busy doing other things,
     our data will live in this store,
     and when we're testing,
     we can inject a mock object here to give us more insight.
+
+FIXME: @danielfigueira write a paragraph here about ngForm and how we avoid an infinite loop
 
 > The `formSubs` instance variable is the odd one out in this class.
 > Its job is to store the observer/observable subscription
@@ -550,7 +549,7 @@ This is a key feature of Angular's architecture
 object *construction* and object *initialization* are handled separately
 to free us from headaches related to cyclic references.
 
-FIXME: @danielfigueiredo https://github.com/renvrant/formcontrol-freaks/pull/3#discussion_r106822957
+FIXME: @danielfigueiredo update this if you change the actual wizard code to use ngAfterViewInit
 
 The right place to connect everything is `ngOnInit`,
 which is called after all the objects in the system have been created
@@ -593,8 +592,11 @@ whenever the form changes,
 we dispatch an action created by `saveForm`
 that has `SAVE_FORM` as the change
 and `['character']` as the path to the part of the state we want to modify.
-
-FIXME: how does `SAVE_FORM` get into this as `change`? @danielfigueiredo offered https://github.com/renvrant/formcontrol-freaks/pull/3#discussion_r106823049 but @gvwilson still doesn't understand
+`ngForm`'s `valueChanges` method automatically gives us a `change` value
+that contains all of the form values.
+These values arrive in a JavaScript object that mirrors the structure of the HTML,
+which is exactly what we want
+(because we defined the name attributes to get it).
 
 And that's it:
 every change to our form triggers creation of a new state,
@@ -708,7 +710,12 @@ addSkill() {
 }
 ```
 
-and then write the HTML needed to put all this in front of the user:
+We have put this in the form component,
+but neither Angular nor good design principles strictly require this:
+we could have put it (and similar functions) in a file full of utilities.
+
+Now that we have the functions we need,
+we can write the HTML needed to put everything in front of the user:
 
 ```html
 <label>Skills:</label>
@@ -729,8 +736,6 @@ and then write the HTML needed to put all this in front of the user:
 
 The last line of this HTML is the one that lets users add skills;
 the rest is to handle skill display and removal.
-
-FIXME: @renvrant @danielfigueiredo it will confuse readers to have this much HTML when only one line is relevant, but @gvwilson doesn't see how to strip it down.
 
 ## Conclusion
 
