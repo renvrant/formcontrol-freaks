@@ -472,7 +472,7 @@ In order to synchronize that with our state,
 we create a standard observer/observable connection
 to make `characterForm` watch the character portion of our Redux state.
 
-FIXME: diagram (@renvrant?)
+![Redux Flow Diagram](./redux-flow-diagram.png)
 
 In more detail:
 
