@@ -37,17 +37,20 @@ and returns an HTML page that may or may not contain another form.
 As browsers have become more powerful,
 and as interaction has moved away from the desktop to mobile devices,
 developers have moved more and more of this processing cycle to the client.
-The first step was to write a little JavaScript to sanity-check the data the user entered
-before POSTing it to the server.
+The first step was to write a little JavaScript
+to sanity-check the data the user entered before POSTing it
+so that users wouldn't waste time waiting for the server to respond,
+only to have to fix simple typos in the form.
+
 Programmers quickly began using JavaScript to make form interactions more fluid
 by showing and hiding sections based on what users had entered so far,
 and by fetching bits of data to do things like auto-completion while users were still typing.
-
 All of this made for a better user experience,
 but at the price of increasing client-side complexity.
 A modern single-page application (SPA) may have to keep track of dozens of pieces of information,
 any of which may need to be updated based on the user's actions
 *and* kept in sync with permanent storage on the server.
+
 As if that wasn't complicated enough,
 many of these interactions have to be done asynchronously
 in order to keep the user's FQ (frustration quotient) down.
@@ -88,6 +91,15 @@ In particular,
 systems are a lot easier to reason about and test if they can't change under our feet.
 Pure functional programming therefore lets us substitute
 a cheap, plentiful resource–computer time–for one which is much more expensive–human brain power.
+
+> As we will see below,
+> we can often avoid the need to copy all of the state.
+> If we divide it into logically-separate chunks,
+> we can re-use the chunks that *don't* change.
+> In our experience,
+> the amount of data that actually has to be duplicated
+> only grows slowly with the size of the application
+> so long as we think carefully about how to organize it.
 
 The system we will use to illustrate this idea is [Redux][redux-site],
 which is built on three architectural principles:
@@ -145,7 +157,7 @@ function changeColor(state, action) {
     else if (state.color == 'green')
       return {color: 'amber'};
     else if (state.color == 'amber')
-      return {color: 'green'};
+      return {color: 'red'};
 
   default:
     return state;
@@ -229,8 +241,10 @@ The first step is to plan the shape of our forms.
 We can structure the store however we want,
 but since we know that real applications evolve,
 we will define things using TypeScript interfaces
-rather than relying on specific concrete classes,
-since that will make it easier to swap things in and out for testing later on.
+rather than relying on specific concrete classes.
+That will make it easier to swap things in and out for testing later on.
+(It also encourages us to avoid using `this`,
+which in turn encourages us to think more functionally.)
 
 ```ts
 export interface IForm {
@@ -250,6 +264,8 @@ export interface IBioSummary {
 }
 ```
 
+**FIXME: @renvrant https://github.com/renvrant/formcontrol-freaks/pull/3#discussion_r106822417**
+
 These interfaces define a store
 that contains a single object representing a character,
 rather than using the character itself as the store.
@@ -266,10 +282,18 @@ export interface IForm {
 }
 ```
 
+Equally,
+if we want to add more forms,
+we won't need to reorganize the existing material,
+and we can re-use common actions that work for any form.
+
 One consequence of this decision is that
 every action should contain the path to the particular part of the state it applies to.
 Agile purists might say that we shouldn't add this until we need it,
-but we have enough experience with applications of this kind to know that we're going to,
+and if our application consisted of just a login form and a message of the day,
+they'd be right.
+However,
+we have enough experience with applications of this kind to know that we're going to,
 and adding that to our architecture from the start will save us re-work later.
 
 Having decided on the structure of our store,
@@ -327,6 +351,20 @@ in many different places throughout our program
 is just as risky as using magic numbers
 rather than defining a constant and referring to it.
 
+> The names `type` and `payload` are more than just convention.
+> Redux encourages the former by exporting an `Action` interface defined as:
+>
+> ```ts
+> interface Action { type: string }
+> ```
+>
+> A common practice in the community is to explicitly define a payload using that name,
+> since in some cases we need to add extra info for our actions to be completed:
+>
+> ```ts
+> interface PayloadAction extends Action { payload: any }
+> ```
+
 As an example of an action creation function,
 here's one that saves a form's value:
 
@@ -349,27 +387,28 @@ a library of functional utilities for JavaScript:
 *   `assocPath`: makes a shallow clone of an object,
     replacing the specified property with the specified value as it does so.
     (Think of this as "make me a copy of X, but with Y set to Z".)
-*   `lensPath`: returns a *lens* that points to a particular location in a nested data structure.
-    (This is like a path in a filesystem, and is used for similar purposes.)
 *   `merge`: create a copy of one object with properties merged in from a second object.
     (This is like `assocPath`, but using a second object to get multiple changes at once.)
+*   `path`: retrieve the value at a specified location in a structured object.
+
 
 With these helpers in hand,
 our `formReducer` looks like this:
 
+FIXME: @renvrant can you please check against https://github.com/renvrant/formcontrol-freaks/pull/3#discussion_r106822741
+
 ```ts
-import { lensPath, assocPath, merge } from 'ramda';
+import { path, assocPath, merge } from 'ramda';
 
 export function formReducer(state = initialState: IForm, action) {
   switch (action.type) {
 
   case 'SAVE_FORM':
-    const lensForProp = lensPath(action.payload.path);
-    return assocPath(
-      action.payload.path,
-      merge(view(lensForProp, state), action.payload.value),
-      state
-    );
+     return assocPath(
+       action.payload.path,
+       merge(path(action.payload.path, state), action.payload.value),
+       state
+     );
 
   default:
     return state;
@@ -387,11 +426,11 @@ as long as they all use distinct keys for their actions,
 they will watch the state fly by without doing anything we don't want them to.
 
 If the action does have the right type,
-`formReducer` uses `lensPath` to figure out which part of the state needs to be updated,
-then uses `merge` and `assocPath` to create a copy of the state
-in which that element,
+`formReducer` uses `path` to get the part of the state that needs to be updated,
+then uses `merge` and `assocPath` to create a shallow copy of the state,
+replacing that element,
 *and only that element*,
-has a different value.
+with a different value.
 The most important word in the previous sentence is "create":
 at this point,
 the state that was passed in is thrown away and a new one created.
@@ -432,9 +471,8 @@ using its own dark magic.
 In order to synchronize that with our state,
 we create a standard observer/observable connection
 to make `characterForm` watch the character portion of our Redux state.
-FIXME: I'm waving my hands a bit here...
 
-FIXME: diagram
+FIXME: diagram (@renvrant?)
 
 In more detail:
 
@@ -446,7 +484,7 @@ In more detail:
     We need this because we are going to subscribe to event notifications from that form
     later on.
 *   The `characterForm` instance variable is our working copy of the form's state.
-    FIXME: more explanation needed.
+    FIXME: @renvrant @danielfigueiredo @gvwilson to discuss https://github.com/renvrant/formcontrol-freaks/pull/3#discussion_r106822848
 *   Finally, `private ngRedux: NgRedux<IAppState>` triggers Angular's dependency injection
     and gives us access to the Redux store.
     When our application is busy doing other things,
@@ -498,6 +536,11 @@ anything the user does will be reflected in the state.
 The beauty of this is that if anyone else does an update anywhere,
 everything will keep itself in sync.
 
+> For the sake of simplicity we are synchronizing the whole form object in a single action,
+> which sets the character attribute in the state with a brand new object every time.
+> We could instead sync specific attributes to improve performance
+> by using the `path` mechanism introduced earlier.
+
 It's tempting to put this final piece of wiring in the constructor of our component,
 but that doesn't work
 because Angular has to construct several objects
@@ -506,6 +549,8 @@ This is a key feature of Angular's architecture
 (and of the architectures of many other systems):
 object *construction* and object *initialization* are handled separately
 to free us from headaches related to cyclic references.
+
+FIXME: @danielfigueiredo https://github.com/renvrant/formcontrol-freaks/pull/3#discussion_r106822957
 
 The right place to connect everything is `ngOnInit`,
 which is called after all the objects in the system have been created
@@ -548,7 +593,8 @@ whenever the form changes,
 we dispatch an action created by `saveForm`
 that has `SAVE_FORM` as the change
 and `['character']` as the path to the part of the state we want to modify.
-FIXME: how does `SAVE_FORM` get into this as `change`?
+
+FIXME: how does `SAVE_FORM` get into this as `change`? @danielfigueiredo offered https://github.com/renvrant/formcontrol-freaks/pull/3#discussion_r106823049 but @gvwilson still doesn't understand
 
 And that's it:
 every change to our form triggers creation of a new state,
@@ -684,7 +730,7 @@ and then write the HTML needed to put all this in front of the user:
 The last line of this HTML is the one that lets users add skills;
 the rest is to handle skill display and removal.
 
-FIXME: will it confuse readers to have this much HTML when only one line is relevant?
+FIXME: @renvrant @danielfigueiredo it will confuse readers to have this much HTML when only one line is relevant, but @gvwilson doesn't see how to strip it down.
 
 ## Conclusion
 
