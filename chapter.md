@@ -861,45 +861,6 @@ const isNameValidSelector = createSelector(
 );
 ```
 
-Once we're doing this,
-we will probably also want to create a generic function
-to check multiple validations:
-
-```ts
-const isValid = (...validators): any =>
-  (arg: any) => isNil(find(val => !val(arg), validators));
-```
-
-and then go back and create smaller validation functions:
-
-```ts
-const maxNumberValidation = (max: number) =>
-  (value: number) => value < max;
-
-const maxStringLengthValidation = (max: number) =>
-  (value: string) => value.length < max;
-
-const minStringLengthValidation = (min: number) =>
-  (value: string) => value.length > min;
-```
-
-so that we can pipe our validation rules into the generic `isValid`:
-
-```ts
-const createFormFieldSelector = (fieldPath: string[]) => createSelector(
-  formStateSelector,
-  (form: IForm) => path(fieldPath, form)
-);
-
-const isNameValidSelector = createSelector(
-  createFormFieldSelector(['character', 'name']),
-  isValid(
-    maxStringLengthValidation(50),
-    minStringLengthValidation(3),
-  ),
-);
-```
-
 We can make our application more user-friendly
 by subscribing to the selectors we've made and using them in our template:
 
