@@ -1,15 +1,9 @@
 # Creating Functional Forms
 
-There are many different definitions of the term "software architecture".
-Our favorite is that
-a system's architecture is what you draw on the whiteboard
-when you're explaining it to a new developer.
-Alternatively,
-the architecture of a system is a description of
+The architecture of a software system is a description of
 how to decompose it into pieces,
 how those pieces interact,
 and how that decomposition enables and constrains further development.
-
 In this chapter,
 we will begin our exploration of the architecture of JavaScript applications
 by looking at how to use ideas borrowed from pure functional programming
@@ -17,7 +11,7 @@ to simplify one of the most common tasks in web development:
 form handling.
 At first glance these two topics have nothing to do with each other,
 but paradoxically,
-acting as if the state of our system couldn't be changed
+acting as if the state of our system cannot be changed
 actually makes its changes easier to manage.
 
 ## The Problem
@@ -98,7 +92,7 @@ a cheap, plentiful resource–computer time–for one which is much more expensi
 > we can re-use the chunks that *don't* change.
 > In our experience,
 > the amount of data that actually has to be duplicated
-> only grows slowly with the size of the application
+> will grow slowly with the size of the application
 > so long as we think carefully about how to organize it.
 
 The system we will use to illustrate this idea is [Redux][redux-site],
@@ -237,6 +231,9 @@ This example was built by Renee Vrantsidis and Daniel Figueiredo
 for [the talk][repo-talk] this chapter is based on,
 and the complete application is [available on GitHub][repo-application].
 
+Our overall goals are to take advantage of Redux state management
+to automatically store our form data in state as form values change,
+and if possible to use one mechanism to manage all the forms in our application.
 The first step is to plan the shape of our forms.
 We can structure the store however we want,
 but since we know that real applications evolve,
@@ -265,8 +262,10 @@ export interface IBioSummary {
 ```
 
 These interfaces define the shape of a form in our Redux store,
-which is the part of the store our reducer will be concerned with in this example,
-but do *not* actually create the store.
+which is the part of the store our reducer will be concerned with in this example.
+Defining these interfaces does *not* actually create the store–we will do that in a moment–but
+*does* specify the shape of the objects our reducers will hand back to us.
+
 The form contains a single object representing a character,
 rather than using the character itself as the store.
 That way,
@@ -329,14 +328,16 @@ a list of top-level objects conforming to separately-defined interfaces.
 > We have defined our initial state in a file of its own
 > to make it easier to find and update.
 > In a real application,
-> it would probably be created by some sort of factory
+> it would probably be created programmatically
 > so that we could swap in something else for testing.
 > Note that in real life, it would *not* come from a database:
 > instead, it's the blank slate that would be updated from a database
 > as the application is being bootstrapped.
-> And yes,
+> (And yes,
 > that bootstrap process would be implemented as
-> a series of update actions.
+> a series of update actions.)
+> However the initial state is created,
+> it should be as empty as possible.
 
 Another early decision is that we will define functions to create actions,
 and that each action will have two elements:
@@ -454,7 +455,7 @@ and use the `@Component` decorator to weld some metadata to it:
 })
 export class CharacterForm {
   @ViewChild(NgForm) ngForm: NgForm;
-  public characterForm;
+  public characterForm: IForm;
   private formSubs;
 
   constructor(private ngRedux: NgRedux<IAppState>) {}
@@ -465,7 +466,8 @@ There's a lot going on here,
 so we'll start with a high-level explanation and then dive into details.
 As the diagram shows,
 Angular will keep `ngForm` and `characterForm` in sync with each other
-using its own dark magic.
+using its own dark magic,
+which we will see in a moment.
 In order to synchronize that with our state,
 we create a standard observer/observable connection
 to make `characterForm` watch the character portion of our Redux state.
@@ -744,6 +746,14 @@ One way to see how these changes pays off is to look at validation,
 and in particular at the way in which we can use *selectors* to compute data by composing functions,
 and then use *memoization* to make state changes more efficient.
 
+> For those who wish to be more precise,
+> we should distinguish between selectors as a general concept
+> and selectors as implemented by the `reselect` library that we're using.
+> The memoization benefits come from `reselect`,
+> but the general benefit of using a selector for validation is that
+> you can derive the validity of your form from the data you already have
+> without having to dispatch extra actions like `VALIDATE_FIELD`.
+
 Selectors chain functions together
 and pipe their return values into the last function in the chain.
 In the simple code below,
@@ -786,7 +796,7 @@ we can use `isFormValid$` with an asynchronous pipe in our template:
 </button>
 ```
 
-(The `$` on the end of `isFormValid$` is a convention in the RxJS library meaning,
+(The `$` on the end of `isFormValid$` is a naming convention used in the RxJS library and elsewhere meaning,
 "This is an observable."
 We don't have to use it,
 but we find it helps make code easier to understand.)
@@ -902,10 +912,10 @@ by subscribing to the selectors we've made and using them in our template:
 ```
 
 Since we have access to Angular's `FormControl` states,
-we can us them to show error messages:
+we can use them to show error messages:
 
+```ts
 <input
-  id="name"
   type="text"
   name="name"
   #nameField="ngModel"
@@ -914,6 +924,7 @@ we can us them to show error messages:
   [hidden]="isNameValid || nameField.control.pristine">
   Name must be between 3 and 50 characters
 </div>
+```
 
 ## Conclusion
 
