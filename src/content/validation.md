@@ -70,7 +70,7 @@ After selecting, we can use `isFormValid$` with the async pipe in our template
 Much like we would create validators, we can create specific rules per-field
 
 ```ts
-const isAgeValid = createSelector(
+export const isAgeValid = createSelector(
   bioSummarySelector,
   (bioSummary: IBioSummary) => {
     switch (bioSummary.race) {
@@ -106,11 +106,12 @@ export const isNameValidSelector = createSelector(
 Once we have a list of validation rules for our fields, we can chain those selectors together
 
 ```ts
-export const isFormValidSelector = createSelector(
+const isFormValidSelector = createSelector(
   isAgeValidSelector,
   isNameValidSelector,
   (ageValid, nameValid) => ageValid 
     && nameValid
+);
 ```
 
 ---
