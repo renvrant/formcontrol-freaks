@@ -552,8 +552,6 @@ This is a key feature of Angular's architecture
 object *construction* and object *initialization* are handled separately
 to free us from headaches related to cyclic references.
 
-FIXME: @danielfigueiredo update this if you change the actual wizard code to use ngAfterViewInit
-
 The right place to connect everything is `ngOnInit`,
 which is called after all the objects in the system have been created
 but before any of them are used.
