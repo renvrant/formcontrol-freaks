@@ -29,7 +29,7 @@ const characterFormSelector = createSelector(
 ---
 
 ## Validating the entire form
-For now let's just check for required fields
+Check if the form has required fields
 
 ```ts
 export const isFormValid = createSelector(
@@ -45,7 +45,7 @@ export const isFormValid = createSelector(
 ## Add to our component
 
 ```ts
-import { select } from 'ng2-redux';
+import { select } from 'angular-redux';
 import { isFormValidSelector } from '../selectors/character';
 
 ...
@@ -70,25 +70,33 @@ After selecting, we can use `isFormValid$` with the async pipe in our template
 Much like we would create validators, we can create specific rules per-field
 
 ```ts
-const humanAgeValid = isBetweenNumber(14, 40);
-const elfAgeValid = isBetweenNumber(80, 800);
-const tieflingAgeValid = isBetweenNumber(35, 53);
-
-const ageValidationSelector = createSelector(
+export const isAgeValid = createSelector(
   bioSummarySelector,
   (bioSummary: IBioSummary) => {
     switch (bioSummary.race) {
-      case 'Human': return humanAgeValid;
-      case 'Elf': return elfAgeValid;
-      case 'Tiefling': return tieflingAgeValid;
+      case 'Human': return bioSummary.age < 65;
+      case 'Elf': return bioSummary.age < 800;
+      case 'Tiefling': return bioSummary.age < 53;
     }
   }
 );
+```
 
-export const isAgeValidSelector = createSelector(
-  bioSummarySelector,
-  ageValidationSelector,
-  ({age}, isAgeValid) => isAgeValid(age)
+---
+
+## Generic validation functions
+Often you'll want to make a selector out of re-usable validation functions
+
+```ts
+const maxStringLengthValidation = (value: string, max: number) =>
+  value.length < max;
+const minStringLengthValidation = (value: string, min: number) =>
+  value.length > min;
+
+export const isNameValidSelector = createSelector(
+  characterFormSelector,
+  (character) => maxStringLengthValidation(character.name, 50)
+    && minStringLengthValidation(character.name, 3)
 );
 ```
 
@@ -98,72 +106,11 @@ export const isAgeValidSelector = createSelector(
 Once we have a list of validation rules for our fields, we can chain those selectors together
 
 ```ts
-export const isFormValidSelector = createSelector(
+const isFormValidSelector = createSelector(
   isAgeValidSelector,
   isNameValidSelector,
   (ageValid, nameValid) => ageValid 
     && nameValid
-```
-
----
-
-## Generic validation
-Often you'll want to make a selector out of re-usable validation functions
-
-```ts
-export const maxStringLengthValidation = (value: string, max: number) =>
-  value.length < max;
-export const minStringLengthValidation = (value: string, min: number) =>
-  value.length > min;
-
-export const isNameValidSelector = createSelector(
-  createFormFieldSelector(['character', 'name']),
-  (name: string) => maxStringLengthValidation(name, 50)
-    && minStringLengthValidation(name, 3)
-);
-```
-
----
-
-## Creating generic validators (1/3)
-You can create a generic function to check multiple validations
-
-```ts
-export const isValid = (...validators): any =>
-  (arg: any) => isNil(find(val => !val(arg), validators));
-```
-
----
-
-## Creating generic validators (2/3)
-Then create small validation functions
-
-```ts
-export const maxNumberValidation = (max: number) =>
-  (value: number) => value < max;
-export const maxStringLengthValidation = (max: number) =>
-  (value: string) => value.length < max;
-export const minStringLengthValidation = (min: number) =>
-  (value: string) => value.length > min;
-```
-
----
-
-## Creating generic validation (3/3)
-Then pipe your validation rules into `isValid`
-
-```ts
-export const createFormFieldSelector = (fieldPath: string[]) => createSelector(
-  formStateSelector,
-  (form: IForm) => path(fieldPath, form)
-);
-
-export const isNameValidSelector = createSelector(
-  createFormFieldSelector(['character', 'name']),
-  isValid(
-    maxStringLengthValidation(50),
-    minStringLengthValidation(3),
-  ),
 );
 ```
 
