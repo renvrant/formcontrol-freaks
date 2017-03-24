@@ -42,6 +42,10 @@ and by fetching bits of data to do things like auto-completion while users were 
 All of this made for a better user experience,
 but at the price of increasing client-side complexity.
 A modern single-page application (SPA) may have to keep track of dozens of pieces of information,
+
+> FIXME dozens is on the relatively low side for a lot of apps, could easily
+be hundreds
+
 any of which may need to be updated based on the user's actions
 *and* kept in sync with permanent storage on the server.
 
@@ -70,6 +74,9 @@ or *mutated*,
 in place:
 once a value is defined,
 it is *immutable*.
+
+> FIXME I'm assuming this definition is purposefully abridged to reduce clutter?
+
 Rather than changing its state,
 a program written in a pure functional language creates an entirely new state
 on which to operate.
@@ -83,6 +90,10 @@ However,
 making state immutable has a lot of advantages when we are dealing with concurrency.
 In particular,
 systems are a lot easier to reason about and test if they can't change under our feet.
+
+> FIXME I really like the term "reason about" but I have also seen the term
+weaponized by the opposition as being "hand wavy".
+
 Pure functional programming therefore lets us substitute
 a cheap, plentiful resource–computer time–for one which is much more expensive–human brain power.
 
@@ -208,6 +219,8 @@ function changeColor(state, action) {
 }
 ```
 
+> FIXME `...as above...` here but the previous was `...as before...`
+
 This may seem like a lot of work to manage a single traffic light,
 but that work pays off as soon as we have to worry about asynchronous updates.
 For example,
@@ -222,6 +235,7 @@ setTimeout(() => changeColor(state, {type: 'EMERGENCY'}), delay);
 When the timeout callback is triggered,
 Redux will put the traffic light in the required state
 regardless of what else has gone on or is going on.
+
 
 ## Setting Up Forms to Work with Redux
 
@@ -352,7 +366,15 @@ in many different places throughout our program
 is just as risky as using magic numbers
 rather than defining a constant and referring to it.
 
+> FIXME I really like: _experience teaches us that creating literal objects
+in many different places throughout our program is just as risky as using magic
+numbers_ and its sentiment could potentially be echoed elsewhere in the document
+
 > The names `type` and `payload` are more than just convention.
+
+> FIXME `type` is a hard requirement but `payload` is convention, or at least
+was.  Same with `meta` and `error`
+
 > Redux encourages the former by exporting an `Action` interface defined as:
 >
 > ```ts
@@ -390,6 +412,9 @@ a library of functional utilities for JavaScript:
     (Think of this as "make me a copy of X, but with Y set to Z".)
 *   `merge`: create a copy of one object with properties merged in from a second object.
     (This is like `assocPath`, but using a second object to get multiple changes at once.)
+
+> FIXME it's worth pointing out that `merge` is also shallow
+
 *   `path`: retrieve the value at a specified location in a structured object.
 
 
@@ -507,6 +532,9 @@ Since `CharacterForm` is an Angular component,
 it needs a template to define how it will be rendered.
 In keeping with good modern practice,
 we will use a template-driven form
+
+> FIXME is this good modern practice or just an Angular thing?
+
 and bind its inputs to objects retrieved from the Redux state.
 The first part of that form looks like this:
 
@@ -789,7 +817,7 @@ after selecting,
 we can use `isFormValid$` with an asynchronous pipe in our template:
 
 ```ts
-<button 
+<button
   [disabled]="!(isFormValid$ | async)"
   type="submit">
   Save
