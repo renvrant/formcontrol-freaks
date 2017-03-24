@@ -41,7 +41,7 @@ by showing and hiding sections based on what users had entered so far,
 and by fetching bits of data to do things like auto-completion while users were still typing.
 All of this made for a better user experience,
 but at the price of increasing client-side complexity.
-A modern single-page application (SPA) may have to keep track of dozens of pieces of information,
+A modern single-page application (SPA) may have to keep track of hundreds of pieces of information,
 any of which may need to be updated based on the user's actions
 *and* kept in sync with permanent storage on the server.
 
@@ -197,7 +197,7 @@ function changeColor(state, action) {
   switch(action.type) {
 
     case 'NEXT':
-      ...as above...
+      ...as before...
 
     case 'EMERGENCY':
       return {color: 'red'};
@@ -352,14 +352,14 @@ in many different places throughout our program
 is just as risky as using magic numbers
 rather than defining a constant and referring to it.
 
-> The names `type` and `payload` are more than just convention.
-> Redux encourages the former by exporting an `Action` interface defined as:
+> The name `type` is a requirement:
+> Redux mandates it by exporting an `Action` interface defined as:
 >
 > ```ts
 > interface Action { type: string }
 > ```
 >
-> A common practice in the community is to explicitly define a payload using that name,
+> The name `payload` is not required, but is widely used and strongly encouraged,
 > since in some cases we need to add extra info for our actions to be completed:
 >
 > ```ts
@@ -388,7 +388,7 @@ a library of functional utilities for JavaScript:
 *   `assocPath`: makes a shallow clone of an object,
     replacing the specified property with the specified value as it does so.
     (Think of this as "make me a copy of X, but with Y set to Z".)
-*   `merge`: create a copy of one object with properties merged in from a second object.
+*   `merge`: create a shallow copy of one object with properties merged in from a second object.
     (This is like `assocPath`, but using a second object to get multiple changes at once.)
 *   `path`: retrieve the value at a specified location in a structured object.
 
@@ -505,7 +505,7 @@ Looking more closely at the code used to create all of this:
 
 Since `CharacterForm` is an Angular component,
 it needs a template to define how it will be rendered.
-In keeping with good modern practice,
+In keeping with Angular best practices,
 we will use a template-driven form
 and bind its inputs to objects retrieved from the Redux state.
 The first part of that form looks like this:
