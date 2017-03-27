@@ -16,32 +16,20 @@ actually makes its changes easier to manage.
 
 ## The Problem
 
-Users can interact with programs in a bewildering variety of ways,
-but the most popular on the web remains the HTML form.
-In a classic 1990s-style application,
-a user is presented with a form,
-fills in the fields,
-and clicks "Submit".
-This sends an HTTP POST request to a server
-with the information the user entered as its payload.
-The server validates that information,
-updates a database,
-and returns an HTML page that may or may not contain another form.
+You have probably built web applications that use forms.
+They are easy enough to manage if you only have a few,
+or a few dozen,
+but manual approaches fall apart by the time you have
+hundreds of distinct forms,
+each of which can update the application's state in different ways.
 
-As browsers have become more powerful,
-and as interaction has moved away from the desktop to mobile devices,
-developers have moved more and more of this processing cycle to the client.
-The first step was to write a little JavaScript
-to sanity-check the data the user entered before POSTing it
-so that users wouldn't waste time waiting for the server to respond,
-only to have to fix simple typos in the form.
-
-Programmers quickly began using JavaScript to make form interactions more fluid
-by showing and hiding sections based on what users had entered so far,
-and by fetching bits of data to do things like auto-completion while users were still typing.
-All of this made for a better user experience,
-but at the price of increasing client-side complexity.
-A modern single-page application (SPA) may have to keep track of hundreds of pieces of information,
+Angular provides some good tools for building forms,
+but these are not be enough by themselves in very large programs.
+In particular,
+`NgForm` leaves state management entirely in the developer's hands,
+which quickly results in unmanageable client-side complexity:
+a modern single-page application (SPA) may have to keep track of
+hundreds of pieces of information,
 any of which may need to be updated based on the user's actions
 *and* kept in sync with permanent storage on the server.
 
@@ -58,7 +46,12 @@ Our problem is therefore this:
 
 > How should we manage client-side state in an asynchronous web application that uses forms?
 
-## Enter Redux
+Our solution is:
+
+> Use Redux to represent state as a sequence of snapshots,
+> each of which is created in response to a single action.
+
+## Redux in a Hurry
 
 Luckily for us,
 people who use pure functional programming languages
@@ -227,9 +220,8 @@ regardless of what else has gone on or is going on.
 
 As our running example,
 we will build a set of forms that allow users to create a wizard for a role-playing game.
-This example was built by Renee Vrantsidis and Daniel Figueiredo
-for [the talk][repo-talk] this chapter is based on,
-and the complete application is [available on GitHub][repo-application].
+We created this example for [a talk][repo-talk] at [NG Conf 2017][ng-conf],
+and the complete source is [available on GitHub][repo-application].
 
 Our overall goals are to take advantage of Redux state management
 to automatically store our form data in state as form values change,
@@ -392,7 +384,8 @@ a library of functional utilities for JavaScript:
     (This is like `assocPath`, but using a second object to get multiple changes at once.)
 *   `path`: retrieve the value at a specified location in a structured object.
 
-
+(We could write replacements for these to avoid depending on Ramda,
+but we prefer to leverage the work they've put into testing and performance optimization.)
 With these helpers in hand,
 our `formReducer` looks like this:
 
@@ -929,6 +922,7 @@ allow programmers to be more efficient.
 If you would like to share your experiences with this,
 we'd enjoy hearing from you.
 
+[ng-conf]: https://www.ng-conf.org/
 [ramda-site]: http://ramdajs.com/
 [redux-site]: http://redux.js.org/
 [redux-test]: http://redux.js.org/docs/recipes/WritingTests.html
