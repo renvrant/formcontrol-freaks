@@ -40,8 +40,12 @@
 
 ---
 
+![Redux Flow](content/images/full-redux-flow.png "Redux Flow")
+
+---
+
 ## Not in this talk
-- Redux 101
+- Intro to Redux
 
 ---
 
