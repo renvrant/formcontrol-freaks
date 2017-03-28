@@ -10,14 +10,11 @@
 ---
 
 ## Creating a character selector
-Selectors chain functions and pipe their return values into the final function 
-`form.character` will be returned by this selector
+- Selectors might chain multiple functions
+- Each chained function returns a value
+- The last function in the chain receives all returned values 
 
 ```ts
-import { IAppState } from '../store/store';
-import { createSelector } from 'reselect';
-import { IForm } from '../store/types';
-
 const formStateSelector = (state: IAppState) => state.form;
 
 const characterFormSelector = createSelector(
@@ -25,6 +22,7 @@ const characterFormSelector = createSelector(
   (form: IForm) => form.character
 );
 ```
+- `form.character` is returned from `characterFormSelector`
 
 ---
 
@@ -45,7 +43,7 @@ export const isFormValid = createSelector(
 ## Add to our component
 
 ```ts
-import { select } from 'angular-redux';
+import { select } from '@angular-redux/store';
 import { isFormValidSelector } from '../selectors/character';
 
 ...
@@ -70,33 +68,11 @@ After selecting, we can use `isFormValid$` with the async pipe in our template
 Much like we would create validators, we can create specific rules per-field
 
 ```ts
-export const isAgeValid = createSelector(
-  bioSummarySelector,
-  (bioSummary: IBioSummary) => {
-    switch (bioSummary.race) {
-      case 'Human': return bioSummary.age < 65;
-      case 'Elf': return bioSummary.age < 800;
-      case 'Tiefling': return bioSummary.age < 53;
-    }
-  }
-);
-```
-
----
-
-## Generic validation functions
-Often you'll want to make a selector out of re-usable validation functions
-
-```ts
-const maxStringLengthValidation = (value: string, max: number) =>
-  value.length < max;
-const minStringLengthValidation = (value: string, min: number) =>
-  value.length > min;
-
-export const isNameValidSelector = createSelector(
-  characterFormSelector,
-  (character) => maxStringLengthValidation(character.name, 50)
-    && minStringLengthValidation(character.name, 3)
+const isNameValidSelector = createSelector(
+  characterNameSelector,
+  ({name}) => name 
+    && name.length > 3
+    && name.length < 50
 );
 ```
 
@@ -106,10 +82,11 @@ export const isNameValidSelector = createSelector(
 Once we have a list of validation rules for our fields, we can chain those selectors together
 
 ```ts
-const isFormValidSelector = createSelector(
-  isAgeValidSelector,
+export const isFormValidSelector = createSelector(
+  characterFormSelector,
   isNameValidSelector,
-  (ageValid, nameValid) => ageValid 
+  (character, nameValid) => character.bioSummary.age
+    && character.skills.length > 0  
     && nameValid
 );
 ```
