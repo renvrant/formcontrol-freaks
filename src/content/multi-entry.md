@@ -41,7 +41,7 @@ export const removeFromArray = (index, path) => ({
 ```ts
 import { concat, remove, update } from 'ramda';
 
-CASE 'UPDATE_INDEXED_FORM_VALUE':
+case 'UPDATE_INDEXED_FORM_VALUE':
   const lensForProp = lensPath(action.payload.path);
   const propValue = <any[]> view(lensForProp, state);
   return assocPath(
