@@ -64,6 +64,10 @@ After selecting, we can use `isFormValid$` with the async pipe in our template
 
 ---
 
+![Selector Flow](content/images/selector-flow.png "Selector Flow")
+
+---
+
 ## Field-specific validation rules
 Much like we would create validators, we can create specific rules per-field
 

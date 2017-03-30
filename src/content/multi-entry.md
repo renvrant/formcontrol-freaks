@@ -18,14 +18,14 @@ character: {
 Add actions to support repeatable `select` fields
 
 ```ts
-export const addIntoArray = (path, value) => ({
-  type: 'ADD_INDEXED_FORM_VALUE',
-  payload: { path, value }
-});
-
 export const putInArray = (path, value, index) => ({
   type: 'UPDATE_INDEXED_FORM_VALUE',
   payload: { path, value, index }
+});
+
+export const addIntoArray = (path, value) => ({
+  type: 'ADD_INDEXED_FORM_VALUE',
+  payload: { path, value }
 });
 
 export const removeFromArray = (index, path) => ({
@@ -41,12 +41,12 @@ export const removeFromArray = (index, path) => ({
 ```ts
 import { concat, remove, update } from 'ramda';
 
-case 'ADD_INDEXED_FORM_VALUE':
+case 'UPDATE_INDEXED_FORM_VALUE':
   const lensForProp = lensPath(action.payload.path);
   const propValue = <any[]> view(lensForProp, state);
   return assocPath(
     action.payload.path,
-    concat(propValue, [action.payload.value]),
+    update(action.payload.index, action.payload.value, propValue),
     state
   );
 ```
@@ -56,12 +56,12 @@ case 'ADD_INDEXED_FORM_VALUE':
 ## Updating the reducer (2/2)
 
 ```ts
-CASE 'UPDATE_INDEXED_FORM_VALUE':
+case 'ADD_INDEXED_FORM_VALUE':
   const lensForProp = lensPath(action.payload.path);
   const propValue = <any[]> view(lensForProp, state);
   return assocPath(
     action.payload.path,
-    update(action.payload.index, action.payload.value, propValue),
+    concat(propValue, [action.payload.value]),
     state
   );
 
@@ -77,7 +77,7 @@ case 'REMOVE_INDEXED_FORM_VALUE':
 
 ---
 
-## Update our form component
+## Update our form component (1/2)
 These new actions let us add a list of skills
 
 ```ts
@@ -89,7 +89,12 @@ onSelectSkill({event, index}) {
     path: [ 'character', 'skills' ]
   }));
 }
+```
 
+---
+## Update our form component (2/2)
+
+```ts
 addSkill() {
   this.ngRedux.dispatch(addIntoArray({
     value: undefined,
