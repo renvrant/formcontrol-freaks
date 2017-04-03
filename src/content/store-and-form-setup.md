@@ -82,10 +82,13 @@ import { lensPath, assocPath, merge } from 'ramda';
 export function formReducer(state = initialState: IForm, action) {
   switch (action.type) {
   case 'SAVE_FORM':
-    const lensForProp = lensPath(action.payload.path);
+    const propPath = action.payload.path;
     return assocPath(
-      action.payload.path,
-      merge(view(lensForProp, state), action.payload.value),
+      propPath,
+      merge(
+        path<string[]>(propPath, state),
+        action.payload.value
+      ),
       state
     );
   default:

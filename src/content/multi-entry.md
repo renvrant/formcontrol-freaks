@@ -18,19 +18,19 @@ character: {
 Add actions to support repeatable `select` fields
 
 ```ts
-export const putInArray = (path, value, index) => ({
-  type: 'UPDATE_INDEXED_FORM_VALUE',
-  payload: { path, value, index }
-});
-
 export const addIntoArray = (path, value) => ({
-  type: 'ADD_INDEXED_FORM_VALUE',
+  type: 'ADD_MULTI_ENTRY_FORM_VALUE',
   payload: { path, value }
 });
 
-export const removeFromArray = (index, path) => ({
-  type: 'REMOVE_INDEXED_FORM_VALUE',
-  payload: { index, path }
+export const putInArray = (path, value, index) => ({
+  type: 'UPDATE_MULTI_ENTRY_FORM_VALUE',
+  payload: { path, value, index }
+});
+
+export const removeFromArray = (path, index) => ({
+  type: 'REMOVE_MULTI_ENTRY_FORM_VALUE',
+  payload: { path, index }
 });
 ```
 
@@ -41,36 +41,15 @@ export const removeFromArray = (index, path) => ({
 ```ts
 import { concat, remove, update } from 'ramda';
 
-case 'UPDATE_INDEXED_FORM_VALUE':
-  const lensForProp = lensPath(action.payload.path);
-  const propValue = <any[]> view(lensForProp, state);
+case 'UPDATE_MULTI_ENTRY_FORM_VALUE':
+  const propPath = action.payload.path;
   return assocPath(
-    action.payload.path,
-    update(action.payload.index, action.payload.value, propValue),
-    state
-  );
-```
-
----
-
-## Updating the reducer (2/2)
-
-```ts
-case 'ADD_INDEXED_FORM_VALUE':
-  const lensForProp = lensPath(action.payload.path);
-  const propValue = <any[]> view(lensForProp, state);
-  return assocPath(
-    action.payload.path,
-    concat(propValue, [action.payload.value]),
-    state
-  );
-
-case 'REMOVE_INDEXED_FORM_VALUE':
-  const lensForProp = lensPath(action.payload.path);
-  const propValue = <any[]> view(lensForProp, state);
-  return assocPath(
-    action.payload.path,
-    remove(action.payload.index, 1, propValue),
+    propPath,
+    update(
+      action.payload.index, 
+      action.payload.value, 
+      path<string[]>(propPath, state)
+    ),
     state
   );
 ```
@@ -85,25 +64,6 @@ onSelectSkill({event, index}) {
   const skill = event.target.value;
   this.ngRedux.dispatch(putInArray({
     value: skill,
-    index,
-    path: [ 'character', 'skills' ]
-  }));
-}
-```
-
----
-## Update our form component (2/2)
-
-```ts
-addSkill() {
-  this.ngRedux.dispatch(addIntoArray({
-    value: undefined,
-    path: [ 'character', 'skills' ]
-  }));
-}
-
-removeSkill(index) {
-  this.ngRedux.dispatch(removeFromArray({
     index,
     path: [ 'character', 'skills' ]
   }));

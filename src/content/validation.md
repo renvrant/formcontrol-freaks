@@ -2,6 +2,14 @@
 
 ---
 
+![Validation Sucks](content/images/tiamat.jpg "Validation Sucks")
+
+---
+
+![But it can be better](content/images/tiny-tiamat.jpg "https://www.facebook.com/MDDragons")
+
+---
+
 ## Validation as selectors
 - Selectors can compute data from the store through function composition
 - No actions for validations, less updates in the store
@@ -9,10 +17,15 @@
 
 ---
 
-## Creating a character selector
+## How selectors work
 - Selectors might chain multiple functions
 - Each chained function returns a value
 - The last function in the chain receives all returned values 
+
+---
+
+## Creating a character form selector
+`state.form.character` is returned from `characterFormSelector`
 
 ```ts
 const formStateSelector = (state: IAppState) => state.form;
@@ -22,7 +35,6 @@ const characterFormSelector = createSelector(
   (form: IForm) => form.character
 );
 ```
-- `form.character` is returned from `characterFormSelector`
 
 ---
 
@@ -42,6 +54,8 @@ export const isFormValid = createSelector(
 
 ## Add to our component
 
+After selecting, we can use `isFormValid$` with the async pipe in our template
+
 ```ts
 import { select } from '@angular-redux/store';
 import { isFormValidSelector } from '../selectors/character';
@@ -51,8 +65,6 @@ import { isFormValidSelector } from '../selectors/character';
 @select(isFormValidSelector)
 isFormValid$: Observable<boolean>;
 ```
-
-After selecting, we can use `isFormValid$` with the async pipe in our template
 
 ```ts
 <button 
