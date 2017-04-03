@@ -39,7 +39,7 @@ export const removeFromArray = (path, index) => ({
 ## Updating the reducer (1/2)
 
 ```ts
-import { concat, remove, update } from 'ramda';
+import { assocPath, path, update } from 'ramda';
 
 case 'UPDATE_MULTI_ENTRY_FORM_VALUE':
   const propPath = action.payload.path;

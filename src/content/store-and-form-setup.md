@@ -77,7 +77,7 @@ export const saveForm = (path, value) => ({
 Our form changes will be merged at the provided path
 
 ```ts
-import { lensPath, assocPath, merge } from 'ramda';
+import { path, assocPath, merge } from 'ramda';
 
 export function formReducer(state = initialState: IForm, action) {
   switch (action.type) {
