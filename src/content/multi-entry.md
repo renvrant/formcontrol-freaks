@@ -36,7 +36,7 @@ export const removeFromArray = (path, index) => ({
 
 ---
 
-## Updating the reducer (1/2)
+## Updating the reducer
 
 ```ts
 import { assocPath, path, update } from 'ramda';
@@ -56,7 +56,7 @@ case 'UPDATE_MULTI_ENTRY_FORM_VALUE':
 
 ---
 
-## Update our form component (1/2)
+## Update our form component
 These new actions let us add a list of skills
 
 ```ts

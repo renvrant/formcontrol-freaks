@@ -3,8 +3,7 @@
 ---
 
 ## One reducer to rule them all
-We want a single form reducer to handle all of our forms
-(and in the darkness bind them)
+We want a single form reducer to handle all of our forms<br>(and in the darkness bind them)
 
 ```ts
 export const rootReducer = combineReducers<IAppState>({
@@ -18,18 +17,16 @@ export const rootReducer = combineReducers<IAppState>({
 Your form can be structured however you want on the store
 
 ```ts
-// The interface our reducer will use
-export interface IForm {
+export interface IForm { // interface for the form reducer
   character: ICharacter;
 }
 
-export interface ICharacter {
+export interface ICharacter { // interface for the character form
   name?: string;
   bioSummary: IBioSummary;
-  skills: string[];
 }
 
-export interface IBioSummary {
+export interface IBioSummary { // a subsection of the character form
   age: number;
   alignment: string;
   race: string;
@@ -91,8 +88,6 @@ export function formReducer(state = initialState: IForm, action) {
       ),
       state
     );
-  default:
-    return state;
   }
 }
 ```
@@ -124,22 +119,20 @@ In `character-form.html`...
 In `character-form.ts`... 
 
 ```ts
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { NgRedux, select } from 'angular-redux';
-import { saveForm } from '../actions/index';
-import { IAppState } from '../store/store';
+import { NgRedux } from 'angular-redux';
+import { saveForm } from '../actions';
 
 @Component({
   selector: 'character-form',
   template: require('./character-form.html')
 })
-export class CharacterForm {
+export class CharacterForm implements OnInit {
   @ViewChild(NgForm) ngForm: NgForm;
   public characterForm;
   private formSubs;
-
-  constructor(private ngRedux: NgRedux<IAppState>) {}
+  constructor(private ngRedux: NgRedux) {}
 }
 ```
 

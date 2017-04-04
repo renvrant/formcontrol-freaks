@@ -66,10 +66,9 @@ import { isFormValidSelector } from '../selectors/character';
 isFormValid$: Observable<boolean>;
 ```
 
-```ts
-<button 
-  [disabled]="!(isFormValid$ | async)"
-  type="submit">
+```html
+<button type="submit"
+  [disabled]="!(isFormValid$ | async)">
   Save
 </button>
 ```

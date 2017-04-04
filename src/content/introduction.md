@@ -5,13 +5,6 @@
 
 ---
 
-## What's a Rangle?
-- We build Angular (and other JS) apps
-- We use Redux/NgRx for state management
-- We work with a lots of clients, and we noticed a pattern...
-
----
-
 ## Redux can level up your forms
 
 ---
@@ -36,16 +29,16 @@
 - Your forms + Redux magic
 - Adding form data to state
 - Supporting multi-entry fields
-- Framework-agnostic validation with selectors
-
----
-
-![Redux Flow](content/images/full-redux-flow.png "Redux Flow")
+- Controlling validation with selectors
 
 ---
 
 ## Not in this talk
-- Intro to Redux
+- Redux 101
+
+---
+
+![Redux Flow](content/images/full-redux-flow.png "Redux Flow")
 
 ---
 
