@@ -18,10 +18,6 @@
 
 ---
 
-## You can level up your forms
-
----
-
 ![Computer Cat](content/images/catscomputer.jpg "Computer Cat")
 
 ---
