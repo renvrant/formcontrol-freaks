@@ -92,10 +92,3 @@ Using template directives, we create a repeating `select`
 <button type="button" (click)="addSkill()">Add skill</button>
 ```
 
----
-
-## The completed form will...
-- Add an empty item to the array when `addSkill` is called, showing the user another `select`
-- Dispatch `putInArray` when the value of the select changes, updating the skill in place
-- Remove the skill at the appropriate index when `removeSkill` is called, removing the `select` from the UI as well 
-
