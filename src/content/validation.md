@@ -84,7 +84,7 @@ Much like we would create validators, we can create specific rules per-field
 
 ```ts
 const isNameValidSelector = createSelector(
-  characterNameSelector,
+  characterFormSelector,
   ({name}) => name 
     && name.length > 3
     && name.length < 50
