@@ -5,7 +5,11 @@
 
 ---
 
-## Redux can level up your forms
+![Wizard Cat](content/images/wizardcat.jpg "Wizard Cat")
+
+---
+
+## Redux can make your forms magical
 
 ---
 
